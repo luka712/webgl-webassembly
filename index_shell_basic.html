@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en-us">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Emscripten-Generated Code</title>
+
+</head>
+
+<body>
+  
+
+  <input id="clearColor" type="color" />
+  <input id="triangleColor" type="color" />
+  <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
+
+  <script type='text/javascript'>
+  
+
+    var Module = {
+      preRun: [],
+      postRun: [function(){
+        if (njs == null)
+        {
+          njs = new NJS(Module);
+        }
+      }],
+      print: (function ()
+      {
+        return function (text)
+        {
+          if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+          // These replacements are necessary if you render to raw HTML
+          //text = text.replace(/&/g, "&amp;");
+          //text = text.replace(/</g, "&lt;");
+          //text = text.replace(/>/g, "&gt;");
+          //text = text.replace('\n', '<br>', 'g');
+          console.log(text);
+        };
+      })(),
+      printErr: function (text)
+      {
+        if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+        console.error(text);
+      },
+      canvas: (function ()
+      {
+        var canvas = document.getElementById('canvas');
+
+        // As a default initial behavior, pop up an alert when webgl context is lost. To make your
+        // application robust, you may want to override this behavior before shipping!
+        // See http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.15.2
+        canvas.addEventListener("webglcontextlost", function (e) { alert('WebGL context lost. You will need to reload the page.'); e.preventDefault(); }, false);
+
+        return canvas;
+      })(),
+     
+      totalDependencies: 0,
+    };
+    
+    var color = { r: 0, g: 0, b: 0 };
+    var njs = null;
+
+    document.getElementById("clearColor").onchange = function(){
+    
+      const value = document.getElementById("clearColor").value;
+      const v = Number("0x" + value.substring(1,7))
+      const r = (v >> 16 & 255) / 255;
+      const g = (v >> 8 & 255) / 255;
+      const b = (v & 255) / 255;
+      
+      njs.renderer.clearColor(r,g,b,1);
+    }
+
+    document.getElementById("triangleColor").onchange = function ()
+    {
+
+      const value = document.getElementById("triangleColor").value;
+      const v = Number("0x" + value.substring(1, 7))
+      const r = (v >> 16 & 255) / 255;
+      const g = (v >> 8 & 255) / 255;
+      const b = (v & 255) / 255;
+
+      njs.renderer.geometryColor(r, g, b, 1);
+    }
+
+
+  </script>
+  <script async type="text/javascript" src="./dist/bundle.js"></script>
+  {{{ SCRIPT }}}
+</body>
+
+</html>

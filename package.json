@@ -1,0 +1,26 @@
+{
+  "name": "njs",
+  "version": "1.0.0",
+  "description": "* Run emsdk",
+  "main": "index.js",
+  "dependencies": {
+    "ts-loader": "^7.0.5",
+    "typescript": "^3.9.5",
+    "webpack-cli": "^3.3.12",
+    "webpack": "^4.43.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.10.4",
+    "@babel/preset-env": "^7.10.4",
+    "@babel/preset-es2015": "^7.0.0-beta.53",
+    "babel": "^6.23.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.1.0",
+    "babel-preset-env": "^1.7.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
