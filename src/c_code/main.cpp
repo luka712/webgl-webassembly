@@ -1,12 +1,12 @@
 #pragma warning(push)
 #pragma warning(disable : 4800) // conversion warning.
 
-
 #include <stdlib.h>
 #include <emscripten.h>
 #include <stdio.h>
 
 #include "./headers/renderer.h"
+#include "./headers/Loaders/FileLoader.h"
 
 // Example of calling of js function
 EM_JS(void, jsFunction, (float n), {
@@ -17,11 +17,13 @@ void draw();
 
 Renderer* renderer;
 Shader* shader;
+FileLoader *fileLoader;
 
 int main()
 {
     renderer = new Renderer();
     shader = new Shader();
+    fileLoader = new FileLoader();
 
     // request animation draw from javascript
     emscripten_set_main_loop(draw, 0, 0);
@@ -66,3 +68,7 @@ extern "C" void test(Uint8* data)
     jsFunction(data[2]);
 }
 
+extern "C" void load_file(const char* filename)
+{
+    fileLoader->LoadFile(filename);
+}
