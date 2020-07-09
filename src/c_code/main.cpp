@@ -69,9 +69,9 @@ extern "C" void test(Uint8* data)
 
 #pragma region  Exports
 
-extern "C" const char* read_file(const char* filename)
+extern "C" std::string read_file(const char* filename)
 {
-    return FileManager().ReadFile(filename).c_str();
+    return FileManager().ReadFile(filename);
 }
 
 #pragma endregion

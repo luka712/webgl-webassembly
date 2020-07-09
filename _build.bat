@@ -7,4 +7,4 @@ em++^
  -std=c++17^
  --shell-file shell_files/index_shell.html^
  --preload-file src/shaders/color.shader^
- -o dist/index.html
+ -o index.html

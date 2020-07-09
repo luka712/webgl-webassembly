@@ -1,3 +1,7 @@
 node_modules
 dist
+index.data
+index.js
+index.wasm
+index.html
 .vscode
