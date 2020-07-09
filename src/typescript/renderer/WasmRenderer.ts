@@ -9,7 +9,7 @@ export class WasmRenderer implements IRenderer
     {
         this._clearColor = module.cwrap("clear_color", "undefined", ["number", "number", "number", "number"]);
         this._geometryColor = module.cwrap("geometry_color", "undefined", ["string", "number", "number", "number", "number"]);
-        var loadShader = module.cwrap("create_shader_material", "boolean", ["string", "string"]) as ((a:string,b:string) => number);
+        var loadShader = module.cwrap("create_shader_material", "boolean", ["string", "string"]) as ((a: string, b: string) => number);
         const res = loadShader(`
                 
                 attribute vec3 a_position;
