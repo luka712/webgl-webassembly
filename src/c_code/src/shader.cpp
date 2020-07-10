@@ -1,16 +1,16 @@
 #include "../headers/shader.h"
+#include "../headers/io/filemanger.h"
 
-Shader::Shader()
+BaseShader::BaseShader()
 {
-
 }
 
-Shader::~Shader()
+BaseShader::~BaseShader()
 {
     this->DestroyShader();
 }
 
-GLuint Shader::CompileShader(GLenum type, const char *source)
+GLuint BaseShader::CompileShader(GLenum type, const char *source)
 {
     GLuint shader = glCreateShader(type);
 
@@ -40,10 +40,12 @@ GLuint Shader::CompileShader(GLenum type, const char *source)
     return shader;
 }
 
-
-void Shader::Load(const char* vertexShaderSource, const char* fragmentShaderSource)
+void BaseShader::Load(const char *vertexShaderSource, const char *fragmentShaderSource)
 {
     program = glCreateProgram();
+
+    printf("Shader program: %d\n", program);
+
     vertexShader = CompileShader(GL_VERTEX_SHADER, vertexShaderSource);
     fragmentShader = CompileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
     if (vertexShader == 0 || fragmentShader == 0)
@@ -71,83 +73,97 @@ void Shader::Load(const char* vertexShaderSource, const char* fragmentShaderSour
     glEnable(GL_BLEND);
 
     this->isCompiled = true;
+
+    glGenVertexArrays(1, &vao);
 }
 
-
-void Shader::LoadAttribute(GLAttribute* attr)
+void BaseShader::AddVertexBuffer(VertexBuffer *buffer)
 {
-    GLuint vertexBuffer;
-    GLint attributeLoc = glGetAttribLocation(this->program, attr->getName());
-
-    glGenBuffers(this->buffersCount++, &vertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * attr->getLength(), attr->getData(), GL_STATIC_DRAW);
-
-    if(vertexBuffer <= 0){
-        printf("Vertex buffer not bound %d\n", vertexBuffer);
-    }
-
-    glEnableVertexAttribArray(attributeLoc);
-    glVertexAttribPointer(attributeLoc, attr->getSize(), GL_FLOAT, GL_FALSE, 0, 0);
-
-    arrayBuffers.push_back(vertexBuffer);
+    buffer->Initialize(program);
+    vertexBuffers.push_back(buffer);
 }
 
-void Shader::LoadIndices(GLIndices* indices)
+void BaseShader::AddIndexBuffer(IndexBuffer *buffer)
 {
-    glGenBuffers(this->buffersCount++, &this->elementBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->elementBuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices->getLength() * sizeof(unsigned int), indices->getData(), GL_STATIC_DRAW);
-
-    if(this->elementBuffer <= 0){
-        printf("Element buffer not bound %d\n", this->elementBuffer);
-    }
+    buffer->Initialize(program);
+    indexBuffer = buffer;
+    length = indexBuffer->GetLength();
 }
 
-
-
-void Shader::UseProgram()
+void BaseShader::UseProgram()
 {
-    if(this->IsCompiled())
+    if (this->IsCompiled())
     {
-        glUseProgram(program);      
-
-        for (std::map<GLint, float[4]>::iterator it = this->uniformFloat4Lookup.begin(); it != this->uniformFloat4Lookup.end(); ++it)
+        glUseProgram(program);
+        for (auto const &vb : vertexBuffers)
         {
-            float r = it->second[0];
-            float g = it->second[1];
-            float b = it->second[2];
-            float a = it->second[3];
+            vb->Bind();
+        }
+        indexBuffer->Bind();
+
+        for (auto it = this->uniformFloat4Lookup.begin(); it != this->uniformFloat4Lookup.end(); ++it)
+        {
+            float r = it->second.x;
+            float g = it->second.y;
+            float b = it->second.z;
+            float a = it->second.w;
             glUniform4f(it->first, r, g, b, a);
         }
-
     }
 }
 
-void Shader::StopProgram()
+void BaseShader::StopProgram()
 {
-    if(this->IsCompiled())
+    if (this->IsCompiled())
     {
+        for (auto const &vb : vertexBuffers)
+        {
+            vb->Unbind();
+        }
+        indexBuffer->Unbind();
         glUseProgram(0);
     }
 }
 
-void Shader::DestroyShader()
+void BaseShader::DestroyShader()
 {
+    for (auto const &vb : vertexBuffers)
+    {
+        vb->DeleteBuffer();
+    }
+    indexBuffer->DeleteBuffer();
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
     glDeleteProgram(program);
 }
 
-void  Shader::setUniformf4(char *uniform, float r, float g, float b, float a)
+void BaseShader::setUniform4f(char *uniform, float r, float g, float b, float a)
 {
-    if(!this->uniformLocationsLookup.count(uniform))
+    const Vec4 v = Vec4(r, g, b, a);
+    this->setUniform4fv(uniform, v);
+}
+
+void BaseShader::setUniform4fv(char *uniform, Vec4 const &v)
+{
+    if (!this->uniformLocationsLookup.count(uniform))
     {
         this->uniformLocationsLookup[uniform] = glGetUniformLocation(this->program, uniform);
-        this->uniformFloat4Lookup[this->uniformLocationsLookup[uniform]][0] = r;
     }
-    this->uniformFloat4Lookup[this->uniformLocationsLookup[uniform]][0] = r;
-    this->uniformFloat4Lookup[this->uniformLocationsLookup[uniform]][1] = g;
-    this->uniformFloat4Lookup[this->uniformLocationsLookup[uniform]][2] = b;
-    this->uniformFloat4Lookup[this->uniformLocationsLookup[uniform]][3] = a;
+    this->uniformFloat4Lookup[this->uniformLocationsLookup[uniform]] = v;
 }
+
+const ShaderSource BaseShader::GetSourceFromPath(const char *filename)
+{
+    std::string source = FileManager().ReadFile(filename);
+
+    std::string vertex_name = "VERTEX_SHADER";
+    std::string fragment_name = "FRAGMENT_SHADER";
+
+    size_t v_start = source.find(vertex_name);
+    size_t f_start = source.find(fragment_name);
+
+    std::string vertex_source = source.substr(v_start + vertex_name.size(), f_start - vertex_name.size());
+    std::string fragment_source = source.substr(f_start + fragment_name.size());
+
+    return {vertex_source, fragment_source};
+};

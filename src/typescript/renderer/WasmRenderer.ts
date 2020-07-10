@@ -31,9 +31,9 @@ export class WasmRenderer implements IRenderer
         
         // triangle data
         const _arrayF = new Float32Array([
-            -1, -1, 0,
-             1, -1, 0,
-             0, 1, 0
+            -0.5, -0.5, 0,
+             0.5, -0.5, 0,
+             0, 0.5, 0
         ]);
         const dataPtr = module._malloc(_arrayF.BYTES_PER_ELEMENT * _arrayF.length);
         module.HEAPF32.set(_arrayF, dataPtr / _arrayF.BYTES_PER_ELEMENT);
@@ -42,13 +42,13 @@ export class WasmRenderer implements IRenderer
 
         // still not done 
         // indices data 
-        // const _indices = new Int32Array([
-        //     0, 1, 2
-        // ]);
-        // const iDataPtr = module._malloc(_indices.BYTES_PER_ELEMENT * _indices.length);
-        // module.HEAPU32.set(_indices, iDataPtr / _indices.BYTES_PER_ELEMENT);
-        // loadIndicesData(iDataPtr, _indices.length);
-        // module._free(iDataPtr);
+        const _indices = new Int32Array([
+            0, 1, 2
+        ]);
+        const iDataPtr = module._malloc(_indices.BYTES_PER_ELEMENT * _indices.length);
+        module.HEAPU32.set(_indices, iDataPtr / _indices.BYTES_PER_ELEMENT);
+        loadIndicesData(iDataPtr, _indices.length);
+        module._free(iDataPtr);
 
         this.geometryColor(0, 1, 0, 1);
 

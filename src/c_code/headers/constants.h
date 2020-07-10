@@ -1,0 +1,1 @@
+#define COLOR_SHADER_PATH  "/src/shaders/color.shader"
