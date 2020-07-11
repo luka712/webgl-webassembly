@@ -34,6 +34,8 @@ void VertexBuffer::Initialize(const GLuint program)
 void VertexBuffer::Bind()
 {
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
+    glEnableVertexAttribArray(attributeLoc);
+    glVertexAttribPointer(attributeLoc, size, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
 void VertexBuffer::Unbind()

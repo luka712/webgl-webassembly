@@ -1,3 +1,4 @@
+
 #include "../headers/shader.h"
 #include "../headers/io/filemanger.h"
 
@@ -79,12 +80,14 @@ void BaseShader::Load(const char *vertexShaderSource, const char *fragmentShader
 
 void BaseShader::AddVertexBuffer(VertexBuffer *buffer)
 {
+    glUseProgram(program);
     buffer->Initialize(program);
     vertexBuffers.push_back(buffer);
 }
 
 void BaseShader::AddIndexBuffer(IndexBuffer *buffer)
 {
+    glUseProgram(program);
     buffer->Initialize(program);
     indexBuffer = buffer;
     length = indexBuffer->GetLength();
@@ -94,12 +97,13 @@ void BaseShader::UseProgram()
 {
     if (this->IsCompiled())
     {
-        glUseProgram(program);
         for (auto const &vb : vertexBuffers)
         {
             vb->Bind();
         }
         indexBuffer->Bind();
+        glUseProgram(program);
+       
 
         for (auto it = this->uniformFloat4Lookup.begin(); it != this->uniformFloat4Lookup.end(); ++it)
         {
@@ -108,6 +112,11 @@ void BaseShader::UseProgram()
             float b = it->second.z;
             float a = it->second.w;
             glUniform4f(it->first, r, g, b, a);
+        }
+
+        for (auto it = this->uniformMat4Lookup.begin(); it != this->uniformMat4Lookup.end(); ++it)
+        {
+            glUniformMatrix4fv(it->first, 1, GL_FALSE, glm::value_ptr(it->second));
         }
     }
 }
@@ -137,19 +146,28 @@ void BaseShader::DestroyShader()
     glDeleteProgram(program);
 }
 
-void BaseShader::setUniform4f(char *uniform, float r, float g, float b, float a)
+void BaseShader::SetUniform4f(char *uniform, float r, float g, float b, float a)
 {
     const Vec4 v = Vec4(r, g, b, a);
-    this->setUniform4fv(uniform, v);
+    this->SetUniform4fv(uniform, v);
 }
 
-void BaseShader::setUniform4fv(char *uniform, Vec4 const &v)
+void BaseShader::SetUniform4fv(char *uniform, Vec4 const &v)
 {
     if (!this->uniformLocationsLookup.count(uniform))
     {
         this->uniformLocationsLookup[uniform] = glGetUniformLocation(this->program, uniform);
     }
     this->uniformFloat4Lookup[this->uniformLocationsLookup[uniform]] = v;
+}
+
+void BaseShader::SetMatrix4(char* uniform, glm::mat4 const &v)
+{
+     if (!this->uniformLocationsLookup.count(uniform))
+    {
+        this->uniformLocationsLookup[uniform] = glGetUniformLocation(this->program, uniform);
+    }
+    this->uniformMat4Lookup[this->uniformLocationsLookup[uniform]] = v;
 }
 
 const ShaderSource BaseShader::GetSourceFromPath(const char *filename)

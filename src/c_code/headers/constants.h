@@ -1,1 +1,1 @@
-#define COLOR_SHADER_PATH  "/src/shaders/color.shader"
+#define COLOR_SHADER_PATH  "/src/shaders/uniform-color.shader"

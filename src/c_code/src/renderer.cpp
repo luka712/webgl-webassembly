@@ -28,12 +28,20 @@ void Renderer::Draw()
     glClearColor(this->r, this->g, this->b, this->a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // for each thing to draw
+    // 1. bind buffers and set attributes
+    // 2. use program
+    // 3. set uniforms and bind texture units
+    // 4. call draw
+
     for (auto const &shd : shaders)
     {
         shd->UseProgram();
         // for no there would be no cases of drawing without indices
         // glDrawArrays(GL_TRIANGLES, 0, 3);
         glDrawElements(GL_TRIANGLES, shd->GetLength(), GL_UNSIGNED_INT, 0);
+        
+        shd->StopProgram();
     }
 }
 

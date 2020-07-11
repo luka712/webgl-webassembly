@@ -8,5 +8,5 @@ em++^
  -std=c++17^
  --bind^
  --shell-file shell_files/index_shell.html^
- --preload-file src/shaders/color.shader^
+ --preload-file src/shaders/uniform-color.shader^
  -o index.html
