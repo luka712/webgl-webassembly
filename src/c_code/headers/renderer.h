@@ -3,11 +3,13 @@
 #include <list>
 #include "../headers/shader.h"
 
+
 class Renderer
 {
 private:
     SDL_Window *window;
     SDL_Renderer *renderer;
+    Camera *camera;
     std::list<BaseShader *> shaders;
 
     float r = 1;

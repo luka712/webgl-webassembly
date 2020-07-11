@@ -7,9 +7,6 @@
 #include <emscripten/val.h>
 #include <stdio.h>
 
-#include "../../include/glm/mat4x4.hpp"
-#include "../../include/glm/matrix.hpp"
-#include "../../include/glm/ext.hpp"
 #include "./headers/io/filemanger.h"
 #include "./headers/renderer.h"
 
@@ -31,12 +28,14 @@ void draw();
 Renderer *renderer;
 BaseShader *shader;
 ColorShader *colorShader;
+Camera *camera;
 
 int main()
 {
+    camera = new PerspectiveCamera(800, 600);
     renderer = new Renderer();
     shader = new BaseShader();
-    colorShader = new ColorShader();
+    colorShader = new ColorShader(camera);
 
     // request animation draw from javascript
     emscripten_set_main_loop(draw, 0, 0);
@@ -59,8 +58,15 @@ extern "C" void clear_color(const float r, const float g, const float b, const f
 extern "C" void geometry_color(char *uniformName, const float r, const float g, const float b, const float a)
 {
     shader->SetUniform4f(uniformName, r, g, b, a);
-        glm::mat4 orthographic = glm::ortho(0.f, 1.f, 0.75f, 0.f, 0.0f, 100.0f);
-    shader->SetMatrix4("u_projection", orthographic);
+    glm::mat4 projection = glm::perspective(glm::radians(60.0f), 800.0f / 600.f, 0.0f, 100.0f);
+    shader->SetMatrix4("u_projection", projection);
+    glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  15.0f);
+    glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+    glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
+    glm::mat4 view = glm::lookAt(cameraPos, cameraFront, cameraUp);
+    shader->SetMatrix4("u_view", view);
+    glm::mat4 transform = glm::mat4(1.0);
+    shader->SetMatrix4("u_transform", transform);
 }
 
 extern "C" bool create_shader_material(const char *vertexShaderSource, const char *fragmentShaderSource)
@@ -109,6 +115,22 @@ const ShaderSource GetShaderSourceFromPath(const char *filename)
     return BaseShader::GetSourceFromPath(filename);
 }
 
+void MoveCurrentCamera(glm::vec3 pos)
+{
+    camera->Move(pos);
+    colorShader->SetMatrix4(camera->getViewAttrName().c_str(), camera->getViewMatrix());
+}
+
+EMSCRIPTEN_BINDINGS(camera){
+    value_object<glm::vec3>("vec3")
+        .field("x", &glm::vec3::x)
+        .field("y", &glm::vec3::y)
+        .field("z", &glm::vec3::z);
+
+    function("MoveCurrentCamera", &MoveCurrentCamera, allow_raw_pointers());
+}
+
+// shader operations
 EMSCRIPTEN_BINDINGS(shader)
 {
     value_object<ShaderSource>("ShaderSource")

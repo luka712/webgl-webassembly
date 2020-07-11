@@ -15,9 +15,11 @@ export class WasmRenderer implements IRenderer
                 attribute vec3 a_position;
 
                 uniform mat4 u_projection;
+                uniform mat4 u_view;
+                uniform mat4 u_transform;
 
                 void main() {
-                    gl_Position = u_projection * vec4(a_position, 1.);
+                    gl_Position = u_projection * u_view * u_transform * vec4(a_position, 1.);
                 }`,
             `
             precision mediump float;

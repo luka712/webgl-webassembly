@@ -161,7 +161,7 @@ void BaseShader::SetUniform4fv(char *uniform, Vec4 const &v)
     this->uniformFloat4Lookup[this->uniformLocationsLookup[uniform]] = v;
 }
 
-void BaseShader::SetMatrix4(char* uniform, glm::mat4 const &v)
+void BaseShader::SetMatrix4(const char* uniform, glm::mat4 const v)
 {
      if (!this->uniformLocationsLookup.count(uniform))
     {

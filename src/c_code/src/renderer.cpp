@@ -37,6 +37,7 @@ void Renderer::Draw()
     for (auto const &shd : shaders)
     {
         shd->UseProgram();
+
         // for no there would be no cases of drawing without indices
         // glDrawArrays(GL_TRIANGLES, 0, 3);
         glDrawElements(GL_TRIANGLES, shd->GetLength(), GL_UNSIGNED_INT, 0);
