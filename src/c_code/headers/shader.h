@@ -1,14 +1,16 @@
+#pragma once 
+
 #include <stdio.h>
 #include <vector>
 #include <map>
 #include <list>
 #include <string>
-#include "./math/math.h"
-#include "./glattribute.h"
-#include "./glindices.h"
-#include "./buffers/buffers.h"
-#include "./constants.h"
-#include "./camera/camera.h"
+
+#include "../../../include/glm/mat4x4.hpp"
+#include "../../../include/glm/matrix.hpp"
+#include "../../../include/glm/ext.hpp"
+#include "../headers/constants.h"
+#include "../headers/buffers/buffers.h"
 
 struct ShaderSource
 {
@@ -24,11 +26,11 @@ private:
     GLuint fragmentShader;
     GLuint vao;
     IndexBuffer *indexBuffer;
-    std::list<VertexBuffer*> vertexBuffers;
+    std::list<VertexBuffer *> vertexBuffers;
 
     std::map<std::string, GLint> uniformLocationsLookup;
     std::map<GLint, glm::mat4> uniformMat4Lookup;
-    std::map<GLint, Vec4> uniformFloat4Lookup;
+    std::map<GLint, glm::vec4> uniformFloat4Lookup;
 
     int length;
     bool isCompiled;
@@ -39,34 +41,34 @@ public:
     BaseShader();
     ~BaseShader();
 
-    bool IsCompiled()  
-    {
-        return isCompiled;
-    }
+    GLuint GetProgram() const { return program; }
 
+    bool IsCompiled() const { return isCompiled; }
     int GetLength() const { return length; }
 
-    IndexBuffer* GetIndexBuffer() const { return indexBuffer; }
+    IndexBuffer *GetIndexBuffer() const { return indexBuffer; }
 
-    void Load(const char *vertexShaderSource, const char *fragmentShaderSource);
+    void Compile(const char *vertexShaderSource, const char *fragmentShaderSource);
+
     void AddVertexBuffer(VertexBuffer *vertexBuffer);
     void AddIndexBuffer(IndexBuffer *indexBuffer);
-    void DestroyShader();
+    
     void UseProgram();
     void StopProgram();
+    void DestroyShader();
+
     void SetUniform4f(char *uniform, float r, float g, float b, float a);
-    void SetUniform4fv(char *uniform, Vec4 const &vec);
+    void SetUniform4fv(char *uniform, glm::vec4 const &vec);
     void SetMatrix4(const char *uniform, glm::mat4 const matrix);
+
     static const ShaderSource GetSourceFromPath(const char *filepath);
 };
 
 class ColorShader : public BaseShader
 {
-    private:
-        Camera *camera;
 
-    public:
-        ColorShader(Camera *camera);
-        ~ColorShader();
-        void SetColor(Vec4 const &vec);
+public:
+    ColorShader();
+    ~ColorShader();
+    void SetColor(glm::vec4 const &vec);
 };

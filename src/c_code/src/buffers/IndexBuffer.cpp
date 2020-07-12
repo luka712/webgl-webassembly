@@ -22,6 +22,8 @@ void IndexBuffer::Initialize(const GLuint program)
     {
         printf("Element buffer not bound %d\n", buffer);
     }
+
+    isBound = true;
 }
 
 void IndexBuffer::Bind()

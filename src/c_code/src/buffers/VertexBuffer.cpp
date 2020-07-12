@@ -29,6 +29,8 @@ void VertexBuffer::Initialize(const GLuint program)
 
     glEnableVertexAttribArray(attributeLoc);
     glVertexAttribPointer(attributeLoc, size, GL_FLOAT, GL_FALSE, 0, 0);
+
+    isBound = true;
 }
 
 void VertexBuffer::Bind()

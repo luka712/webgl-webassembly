@@ -1,4 +1,5 @@
 #include <string>
+#include "../constants.h"
 #include "../../../../include/glm/mat4x4.hpp"
 #include "../../../../include/glm/matrix.hpp"
 #include "../../../../include/glm/ext.hpp"
@@ -38,9 +39,9 @@ private:
     glm::vec3 up;
 
 public:
-    PerspectiveCamera(int screenWidth,
-                      int screenHeight,
-                      float fov = 60.0f,
+    PerspectiveCamera(int screenWidth = DEFAULT_WIDTH,
+                      int screenHeight = DEFAULT_HEIGHT,
+                      float fov = DEFAULT_FOV,
                       float near = 0.0f,
                       float far = 100.0f,
                       glm::vec3 pos = glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3 lookAt = glm::vec3(0.0f, 0.0f, -1.0f),

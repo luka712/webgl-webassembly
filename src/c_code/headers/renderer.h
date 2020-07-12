@@ -1,7 +1,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 #include <list>
-#include "../headers/shader.h"
+#include "../headers/scene/scenemanager.h"
 
 
 class Renderer

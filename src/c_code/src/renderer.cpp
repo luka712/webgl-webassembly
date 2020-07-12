@@ -1,14 +1,15 @@
 #include "../headers/renderer.h"
 
+
 Renderer::Renderer()
     : Renderer(800, 600)
 {
 }
 
-Renderer::Renderer(int width, int height)
+Renderer::Renderer( int width, int height)
 {
     SDL_Init(SDL_INIT_VIDEO);
-    SDL_CreateWindowAndRenderer(width, height, 0, &this->window, &this->renderer);
+    SDL_CreateWindowAndRenderer(width, height, 0, &window, &renderer);
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
@@ -34,16 +35,38 @@ void Renderer::Draw()
     // 3. set uniforms and bind texture units
     // 4. call draw
 
-    for (auto const &shd : shaders)
-    {
-        shd->UseProgram();
 
-        // for no there would be no cases of drawing without indices
-        // glDrawArrays(GL_TRIANGLES, 0, 3);
-        glDrawElements(GL_TRIANGLES, shd->GetLength(), GL_UNSIGNED_INT, 0);
-        
-        shd->StopProgram();
+    auto meshes = SceneManager::GetInstance()->GetCurrentScene()->GetMeshes();
+    auto camera = SceneManager::GetInstance()->GetCurrentScene()->GetCamera();
+    for (auto const &mesh : *meshes)
+    {
+        //TODO: optimization flags
+        // meshes will have shaders which should be bound accordingly, possibly sorted properly due to optimization reasons.
+        mesh->BindBuffers();
+
+        mesh->UseShader();
+
+        auto transform = mesh->GetTransform();
+        transform->ApplyTransformations();
+        mesh->GetMaterial()->GetShader()->SetMatrix4("u_transform", transform->transform);
+        mesh->GetMaterial()->GetShader()->SetMatrix4("u_view", camera->getViewMatrix());
+        mesh->GetMaterial()->GetShader()->SetMatrix4("u_projection", camera->getProjectionMatrix());
+
+        glDrawElements(GL_TRIANGLES, mesh->GetIndexBuffer()->GetLength(), GL_UNSIGNED_INT, 0);
+
+        mesh->StopShader();
     }
+
+    // for (auto const &shd : shaders)
+    // {
+    //     shd->UseProgram();
+
+    //     // for no there would be no cases of drawing without indices
+    //     // glDrawArrays(GL_TRIANGLES, 0, 3);
+    //     glDrawElements(GL_TRIANGLES, shd->GetLength(), GL_UNSIGNED_INT, 0);
+
+    //     shd->StopProgram();
+    // }
 }
 
 void Renderer::ClearColor(float r, float g, float b, float a)

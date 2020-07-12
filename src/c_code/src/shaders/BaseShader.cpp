@@ -1,6 +1,6 @@
 
-#include "../headers/shader.h"
-#include "../headers/io/filemanger.h"
+#include "../../headers/shader.h"
+#include "../../headers/io/filemanger.h"
 
 BaseShader::BaseShader()
 {
@@ -24,8 +24,6 @@ GLuint BaseShader::CompileShader(GLenum type, const char *source)
 
     if (compile_success == GL_FALSE)
     {
-        printf("failed to compile vertex shader\n");
-
         GLint infoLogLength;
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
 
@@ -38,14 +36,14 @@ GLuint BaseShader::CompileShader(GLenum type, const char *source)
         glDeleteShader(shader);
     }
 
+    glAttachShader(program, shader);
+
     return shader;
 }
 
-void BaseShader::Load(const char *vertexShaderSource, const char *fragmentShaderSource)
+void BaseShader::Compile(const char *vertexShaderSource, const char *fragmentShaderSource)
 {
     program = glCreateProgram();
-
-    printf("Shader program: %d\n", program);
 
     vertexShader = CompileShader(GL_VERTEX_SHADER, vertexShaderSource);
     fragmentShader = CompileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
@@ -55,18 +53,38 @@ void BaseShader::Load(const char *vertexShaderSource, const char *fragmentShader
         glDeleteProgram(program);
     }
 
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, fragmentShader);
-
-    glLinkProgram(program);
 
     GLint link_success = 0;
-
+    glLinkProgram(program);
     glGetProgramiv(program, GL_LINK_STATUS, &link_success);
-
     if (link_success == GL_FALSE)
     {
-        printf("failed to link program \n");
+        GLint infoLogLength;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
+
+        GLchar *strInfoLog = new GLchar[infoLogLength + 1];
+        glGetProgramInfoLog(program, infoLogLength, NULL, strInfoLog);
+
+        printf("failed to link program: '%s'\n", strInfoLog);
+
+        delete[] strInfoLog;
+        glDeleteProgram(program);
+    }
+
+    GLint validate_success = 0;
+    glValidateProgram(program);
+    glGetProgramiv(program, GL_VALIDATE_STATUS, &validate_success);
+    if (validate_success == GL_FALSE)
+    {
+        GLint infoLogLength;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
+
+        GLchar *strInfoLog = new GLchar[infoLogLength + 1];
+        glGetProgramInfoLog(program, infoLogLength, NULL, strInfoLog);
+
+        printf("failed to validate program: '%s'\n", strInfoLog);
+
+        delete[] strInfoLog;
         glDeleteProgram(program);
     }
 
@@ -74,8 +92,6 @@ void BaseShader::Load(const char *vertexShaderSource, const char *fragmentShader
     glEnable(GL_BLEND);
 
     this->isCompiled = true;
-
-    glGenVertexArrays(1, &vao);
 }
 
 void BaseShader::AddVertexBuffer(VertexBuffer *buffer)
@@ -103,7 +119,6 @@ void BaseShader::UseProgram()
         }
         indexBuffer->Bind();
         glUseProgram(program);
-       
 
         for (auto it = this->uniformFloat4Lookup.begin(); it != this->uniformFloat4Lookup.end(); ++it)
         {
@@ -148,11 +163,10 @@ void BaseShader::DestroyShader()
 
 void BaseShader::SetUniform4f(char *uniform, float r, float g, float b, float a)
 {
-    const Vec4 v = Vec4(r, g, b, a);
-    this->SetUniform4fv(uniform, v);
+    this->SetUniform4fv(uniform, glm::vec4(r,g,b,a));
 }
 
-void BaseShader::SetUniform4fv(char *uniform, Vec4 const &v)
+void BaseShader::SetUniform4fv(char *uniform, glm::vec4 const &v)
 {
     if (!this->uniformLocationsLookup.count(uniform))
     {
@@ -161,9 +175,9 @@ void BaseShader::SetUniform4fv(char *uniform, Vec4 const &v)
     this->uniformFloat4Lookup[this->uniformLocationsLookup[uniform]] = v;
 }
 
-void BaseShader::SetMatrix4(const char* uniform, glm::mat4 const v)
+void BaseShader::SetMatrix4(const char *uniform, glm::mat4 const v)
 {
-     if (!this->uniformLocationsLookup.count(uniform))
+    if (!this->uniformLocationsLookup.count(uniform))
     {
         this->uniformLocationsLookup[uniform] = glGetUniformLocation(this->program, uniform);
     }
