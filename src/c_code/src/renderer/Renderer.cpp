@@ -1,22 +1,29 @@
-#include "../headers/renderer.h"
+#include "../../headers/renderer/renderer.h"
 
-
-Renderer::Renderer()
-    : Renderer(800, 600)
+Renderer::~Renderer()
 {
 }
 
-Renderer::Renderer( int width, int height)
+bool Renderer::initialized = false;
+Renderer *Renderer::instance;
+
+Renderer *Renderer::GetInstance()
+{
+    if (Renderer::initialized == false)
+    {
+        Renderer::initialized = true;
+        instance = new Renderer();
+    }
+    return instance;
+}
+
+void Renderer::Initialize(int width, int height)
 {
     SDL_Init(SDL_INIT_VIDEO);
     SDL_CreateWindowAndRenderer(width, height, 0, &window, &renderer);
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
-}
-
-Renderer::~Renderer()
-{
 }
 
 void Renderer::AddShader(BaseShader *shader)
@@ -34,7 +41,6 @@ void Renderer::Draw()
     // 2. use program
     // 3. set uniforms and bind texture units
     // 4. call draw
-
 
     auto meshes = SceneManager::GetInstance()->GetCurrentScene()->GetMeshes();
     auto camera = SceneManager::GetInstance()->GetCurrentScene()->GetCamera();
@@ -56,17 +62,6 @@ void Renderer::Draw()
 
         mesh->StopShader();
     }
-
-    // for (auto const &shd : shaders)
-    // {
-    //     shd->UseProgram();
-
-    //     // for no there would be no cases of drawing without indices
-    //     // glDrawArrays(GL_TRIANGLES, 0, 3);
-    //     glDrawElements(GL_TRIANGLES, shd->GetLength(), GL_UNSIGNED_INT, 0);
-
-    //     shd->StopProgram();
-    // }
 }
 
 void Renderer::ClearColor(float r, float g, float b, float a)

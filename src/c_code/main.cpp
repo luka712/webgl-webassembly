@@ -14,7 +14,7 @@
 #include <stdio.h>
 
 #include "./headers/io/filemanger.h"
-#include "./headers/renderer.h"
+#include "./headers/renderer/renderer.h"
 
 using namespace emscripten;
 
@@ -30,18 +30,14 @@ struct vec2
 };
 
 void Initialize();
+void Load();
 void draw();
 
-Renderer *renderer;
 BaseShader *shader;
 
 int main()
 {
     Initialize();
-
-    renderer = new Renderer();
-    auto quadMesh = new QuadMesh();
-    shader = new BaseShader();
 
     // request animation draw from javascript
     emscripten_set_main_loop(draw, 0, 0);
@@ -50,21 +46,26 @@ int main()
 void Initialize()
 {
     // 1. First initialize render.
-    renderer = new Renderer();
+    Renderer::GetInstance()->Initialize(800,600);
 
     // 2. After renderer scene manager is to be initialized.
     SceneManager::GetInstance()->Initialize();
 }
 
+void Load()
+{
+
+}
+
 void draw()
 {
-    renderer->Draw();
+    Renderer::GetInstance()->Draw();
 }
 
 // extern "C" prevents C++ compiler name mangling
 extern "C" void clear_color(const float r, const float g, const float b, const float a)
 {
-    renderer->ClearColor(r, g, b, a);
+    Renderer::GetInstance()->ClearColor(r, g, b, a);
 }
 
 extern "C" void geometry_color(char *uniformName, const float r, const float g, const float b, const float a)
@@ -146,46 +147,47 @@ glm::vec3 *createVector(float x, float y, float z)
 }
 
 
-EMSCRIPTEN_BINDINGS(mesh)
-{
-    //  value_object<glm::vec3>("vec3")
-    //     .field("x", &glm::vec3::x)
-    //     .field("y", &glm::vec3::y)
-    //     .field("z", &glm::vec3::z);
+// EMSCRIPTEN_BINDINGS(mesh)
+// {
+//     //  value_object<glm::vec3>("vec3")
+//     //     .field("x", &glm::vec3::x)
+//     //     .field("y", &glm::vec3::y)
+//     //     .field("z", &glm::vec3::z);
 
-    function("MoveCurrentCamera", &MoveCurrentCamera, allow_raw_pointers());
+//     function("MoveCurrentCamera", &MoveCurrentCamera, allow_raw_pointers());
 
-    // class_<glm::vec3>("Vec3")
-    //     .constructor(&createVector, allow_raw_pointers())
-    //     .property("x", optional_override([](glm::vec3 &self) -> float {
-    //                   return self.x;
-    //               }));
+//     // class_<glm::vec3>("Vec3")
+//     //     .constructor(&createVector, allow_raw_pointers())
+//     //     .property("x", optional_override([](glm::vec3 &self) -> float {
+//     //                   return self.x;
+//     //               }));
 
-    auto overrideGetPosition = optional_override([](Transform &self) {
-        return self.GetPosition();
-    });
+//     auto overrideGetPosition = optional_override([](Transform &self) {
+//         return self.GetPosition();
+//     });
 
-    class_<Transform>("Transform")
-        .constructor()
-        .function("getPosition", overrideGetPosition, allow_raw_pointers());
+//     const char *name = "Transform";
+//     class_<Transform>(name)
+//         .constructor()
+//         .function("getPosition", overrideGetPosition, allow_raw_pointers());
 
-    // class_<VertexBuffer>("VertexBuffer");
-    // class_<IndexBuffer>("IndexBuffer");
+//     // class_<VertexBuffer>("VertexBuffer");
+//     // class_<IndexBuffer>("IndexBuffer");
 
-    class_<Mesh>("Mesh")
-        .constructor();
+//     class_<Mesh>("Mesh")
+//         .constructor();
 
-    auto overrideGetTransform = optional_override([](QuadMesh &self) {
-        return self.GetTransform();
-    });
+//     auto overrideGetTransform = optional_override([](QuadMesh &self) {
+//         return self.GetTransform();
+//     });
 
-    class_<QuadMesh, base<Mesh>>("QuadMesh")
-        .constructor()
-        .function("getTransform", overrideGetTransform, allow_raw_pointers())
-        .function("translate", &QuadMesh::Translate, allow_raw_pointers());
+//     class_<QuadMesh, base<Mesh>>("QuadMesh")
+//         .constructor()
+//         .function("getTransform", overrideGetTransform, allow_raw_pointers())
+//         .function("translate", &QuadMesh::Translate, allow_raw_pointers());
 
-    function("createQuadMesh", &CreateQuadMesh, allow_raw_pointers());
-}
+//     function("createQuadMesh", &CreateQuadMesh, allow_raw_pointers());
+// }
 
 // shader operations
 EMSCRIPTEN_BINDINGS(shader)

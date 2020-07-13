@@ -2,6 +2,7 @@
 
 #include <GLES3/gl3.h>
 #include <stdio.h>
+#include "../constants.h"
 
 /**
  * @brief  The vertex buffer
@@ -71,7 +72,7 @@ public:
 class QuadVertexBuffer : public VertexBuffer
 {
 private:
-    const float data[12] = {
+    const GLfloat data[12] = {
         -0.5f, -0.5f, 0.0f,
         -0.5f, 0.5, 0.0,
         0.5, -0.5, 0.0,
@@ -90,4 +91,48 @@ private:
 
 public:
     QuadIndexBuffer() : IndexBuffer(data, 6) {}
+};
+
+class CubeVertexBuffer : public VertexBuffer
+{
+    const GLfloat data[24] = {
+        // front
+        -0.5, -0.5, 0.5,
+        0.5, -0.5, 0.5,
+        0.5, 0.5, 0.5,
+        -0.5, 0.5, 0.5,
+        // back
+        -0.5, -0.5, -0.5,
+        0.5, -0.5, -0.5,
+        0.5, 0.5, -0.5,
+        -0.5, 0.5, -0.5};
+
+public:
+    CubeVertexBuffer(const GLchar *name = "a_position") : VertexBuffer(name, 3, data, 24){};
+};
+
+class CubeIndexBuffer : public IndexBuffer
+{
+    const GLuint data[36] = {
+        // front
+        0, 1, 2,
+        2, 3, 0,
+        // right
+        1, 5, 6,
+        6, 2, 1,
+        // back
+        7, 6, 5,
+        5, 4, 7,
+        // left
+        4, 0, 3,
+        3, 7, 4,
+        // bottom
+        4, 5, 1,
+        1, 0, 4,
+        // top
+        3, 2, 6,
+        6, 7, 3};
+
+public:
+    CubeIndexBuffer() : IndexBuffer(data, 36) {};
 };

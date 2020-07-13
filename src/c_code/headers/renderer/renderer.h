@@ -1,12 +1,14 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 #include <list>
-#include "../headers/scene/scenemanager.h"
+#include "../../headers/scene/scenemanager.h"
 
 
 class Renderer
 {
 private:
+    static Renderer *instance;
+    static bool initialized;
     SDL_Window *window;
     SDL_Renderer *renderer;
     Camera *camera;
@@ -18,9 +20,9 @@ private:
     float a = 1;
 
 public:
-    Renderer();
-    Renderer(int width, int height);
     ~Renderer();
+    static Renderer *GetInstance();
+    void Initialize(const int width, const int height);
     void AddShader(BaseShader *shader);
     void Draw();
     void ClearColor(float r, float g, float b, float a);

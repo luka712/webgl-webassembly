@@ -1,6 +1,8 @@
 #pragma once
 
 #include <list>
+#include <emscripten.h>
+#include <emscripten/bind.h>
 #include "../buffers/buffers.h"
 #include "../transform/transform.h"
 #include "../material/material.h"
@@ -24,10 +26,12 @@ private:
 
 protected:
     Material *material;
-    std::list<VertexBuffer *> vbuffers;
+    std::list<VertexBuffer *> *vbuffers;
     IndexBuffer *ibuffer;
     Transform *transform;
     bool isCompiled;
+
+    void SetupMaterialAndMoveToScene();
 
 public:
     Mesh();
@@ -38,9 +42,13 @@ public:
     void UnbindBuffers();
     void UseShader();
     void StopShader();
+
+
     //TODO: MOVE TRANSOFRM TO RENDERABLE
     Transform *GetTransform() { return transform; }
     void Translate(float x, float y, float z);
+    void Scale(float x, float y, float z);
+    void Rotation(float x, float y, float z);
     Material *GetMaterial() { return material; }
     void SetMaterial(Material *mat) { material = mat; }
 };
@@ -49,4 +57,9 @@ class QuadMesh : public Mesh
 {
 public:
     QuadMesh();
+};
+
+class CubeMesh: public Mesh {
+    public:
+        CubeMesh();
 };

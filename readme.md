@@ -11,6 +11,7 @@ wasm build commands are located in _build.bat file. Some notable errors:
 
 - note exported function are *ALWAYS* prefixed with *UNDERSCORE*  <-- This is pain in the *** :) will say undefined exported function
 - note every C++ file needs to be *DEFINED* and *ADDED* as source to script <-- if undefined symbol error pops up, most likely missing C++ script
+- segmatation fault ( usually happens for non initialized c++ pointer variables. ei Shader* shader never gets called via new Shader())
 - there are 2 usefull shell files, one robust, one basic index_shell.html and index_shell_basic.html. Change shell files in _build.bat script to get different index.html output file.
 
 ### TYPESCRIPT compilation
