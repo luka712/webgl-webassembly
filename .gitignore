@@ -4,4 +4,6 @@ index.data
 index.js
 index.wasm
 index.html
+a.out.js
+a.out.wasm
 .vscode

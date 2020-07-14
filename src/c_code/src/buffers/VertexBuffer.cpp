@@ -8,6 +8,15 @@ VertexBuffer::VertexBuffer(const GLchar *name, const GLint size, const float *da
     this->length = length;
 }
 
+VertexBuffer::VertexBuffer(const GLint location, const GLint size, const float *data, const int length)
+{
+    this->attributeLoc = location;
+    this->data = data;
+    this->size = size;
+    this->length = length;
+}
+
+
 VertexBuffer::~VertexBuffer()
 {
     Unbind();
@@ -16,7 +25,11 @@ VertexBuffer::~VertexBuffer()
 
 void VertexBuffer::Initialize(const GLuint program)
 {
-    attributeLoc = glGetAttribLocation(program, name);
+    // meaning it was not bound. attribute location can be passed in case where shader has layout(location = {location}) on attribute
+    if(attributeLoc < 0)
+    {
+        attributeLoc = glGetAttribLocation(program, name);
+    }
     DEBUG_PRINT_FORMAT("Attribute location: %d", attributeLoc);
 
     glGenBuffers(1, &buffer);

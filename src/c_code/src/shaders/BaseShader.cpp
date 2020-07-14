@@ -191,11 +191,32 @@ const ShaderSource BaseShader::GetSourceFromPath(const char *filename)
     std::string vertex_name = "VERTEX_SHADER";
     std::string fragment_name = "FRAGMENT_SHADER";
 
+    // shader might have version, which need to be first line in shader
+    std::string version = "#version";
+
     size_t v_start = source.find(vertex_name);
     size_t f_start = source.find(fragment_name);
 
     std::string vertex_source = source.substr(v_start + vertex_name.size(), f_start - vertex_name.size());
+
+    // delete lines so that version is first thing in shader, if it's actually in shader.
+    v_start = vertex_source.find(version);
+    if (v_start != std::string::npos)
+    {
+        vertex_source = vertex_source.substr(v_start);
+    }
+
     std::string fragment_source = source.substr(f_start + fragment_name.size());
+
+    // same delete for fragment
+    f_start = fragment_source.find(version);
+    if(f_start != std::string::npos)
+    {
+        fragment_source = fragment_source.substr(f_start);
+    }
+
+    DEBUG_PRINT(vertex_source.c_str());
+    DEBUG_PRINT(fragment_source.c_str());
 
     return {vertex_source, fragment_source};
 };

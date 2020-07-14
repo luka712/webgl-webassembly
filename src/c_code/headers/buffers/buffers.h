@@ -12,7 +12,8 @@ class VertexBuffer
 {
 private:
     const GLchar *name;
-    GLuint attributeLoc;
+    // default is -1. In this case property name is used, as layout location was never set via constructor.
+    GLuint attributeLoc = -1;
     GLuint buffer;
     const float *data;
     GLint size;
@@ -29,6 +30,16 @@ public:
      * @param  length: length of data.
      */
     VertexBuffer(const GLchar *name, const GLint size, const float *data, const int length);
+    /**
+     * @brief  Vertex buffer constructor.
+     * @note   Constructor for vertex buffer
+     * @param  location: used to bind directly to shader with layout (location = {location}) property
+     * @param  size: size of attribute in shader. Should be limited to size between 1 and 4. For example for attribute vec3 pass 3.
+     * @param  *data: vertices data.
+     * @param  length: length of data.: 
+     * @retval 
+     */
+    VertexBuffer(const GLint location, const GLint size, const float *data, const int length);
     ~VertexBuffer();
     GLuint GetBuffer() const { return this->buffer; };
     bool IsBound() const { return isBound; }
@@ -79,7 +90,7 @@ private:
         0.5, 0.5, 0.0};
 
 public:
-    QuadVertexBuffer(const GLchar *name = "a_position") : VertexBuffer(name, 3, data, 12){};
+    QuadVertexBuffer() : VertexBuffer(0, 3, data, 12){};
 };
 
 class QuadIndexBuffer : public IndexBuffer
@@ -108,7 +119,7 @@ class CubeVertexBuffer : public VertexBuffer
         -0.5, 0.5, -0.5};
 
 public:
-    CubeVertexBuffer(const GLchar *name = "a_position") : VertexBuffer(name, 3, data, 24){};
+    CubeVertexBuffer() : VertexBuffer(0, 3, data, 24){};
 };
 
 class CubeIndexBuffer : public IndexBuffer

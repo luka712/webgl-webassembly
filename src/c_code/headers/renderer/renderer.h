@@ -11,6 +11,7 @@ private:
     static bool initialized;
     SDL_Window *window;
     SDL_Renderer *renderer;
+    SDL_GLContext gl_context;
     Camera *camera;
     std::list<BaseShader *> shaders;
 

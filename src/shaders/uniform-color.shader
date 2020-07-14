@@ -1,6 +1,7 @@
 VERTEX_SHADER
+#version 300 es
 
-attribute vec3 a_position;
+layout(location = 0) in vec3 a_position;
 
 uniform mat4 u_projection;
 uniform mat4 u_view;
@@ -12,12 +13,15 @@ void main()
 }
 
 FRAGMENT_SHADER
+#version 300 es
 
 precision mediump float;
 
 uniform vec4 u_color;
 
+out vec4 color;
+
 void main()
 {
-    gl_FragColor = u_color;
+    color = u_color;
 }

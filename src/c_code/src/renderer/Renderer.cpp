@@ -19,8 +19,19 @@ Renderer *Renderer::GetInstance()
 
 void Renderer::Initialize(int width, int height)
 {
+
     SDL_Init(SDL_INIT_VIDEO);
-    SDL_CreateWindowAndRenderer(width, height, 0, &window, &renderer);
+
+    // version needs to be setup before renderer creationg
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    // not the SDL_WINDOW_OPENGL flag
+    SDL_CreateWindowAndRenderer(width, height, SDL_WINDOW_OPENGL, &window, &renderer);
+
+    gl_context = SDL_GL_CreateContext(window);
+
+    DEBUG_PRINT_FORMAT("GLVersion = %s\n", glGetString(GL_VERSION));
+    DEBUG_PRINT_FORMAT("vendor = %s\nrenderer = %s\n", glGetString(GL_VENDOR), glGetString(GL_RENDERER));
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
