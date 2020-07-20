@@ -53,7 +53,7 @@ public:
  * @brief  The index buffer.
  * @note   Lowest possibe index buffer entry which goes directly over to GPU. It is used to build a mesh.
  */
-class IndexBuffer
+class IndexBuffer 
 {
 private:
     const GLuint *data;
@@ -145,5 +145,5 @@ class CubeIndexBuffer : public IndexBuffer
         6, 7, 3};
 
 public:
-    CubeIndexBuffer() : IndexBuffer(data, 36) {};
+    CubeIndexBuffer() : IndexBuffer(data, 36){};
 };

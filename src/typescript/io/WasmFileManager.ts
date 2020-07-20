@@ -1,4 +1,4 @@
-import { IFileManager } from "./IFIleManager";
+import { IFileManager } from "../interfaces/file";
 
 export class WasmFileManager implements IFileManager
 {

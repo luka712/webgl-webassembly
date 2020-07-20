@@ -20,3 +20,9 @@ wasm build commands are located in _build.bat file. Some notable errors:
 
 ### RUNNING
 - Start any desired server, for example http-server(https://www.npmjs.com/package/http-server). If by any chance you do not have it installed, run "npm install http-server" and then simply type "http-server"
+
+
+### TODO: 
+* use smart pointers 
+* use vector list
+* explore use of inline function

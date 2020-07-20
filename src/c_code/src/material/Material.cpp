@@ -2,4 +2,5 @@
 
 Material::Material()
 {
+    LOG_CONSTRUCTOR();
 }

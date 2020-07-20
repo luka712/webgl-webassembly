@@ -4,8 +4,8 @@
 
 Scene::Scene()
 {
-    meshes = new std::list<Mesh *>;
-    materials = new std::list<Material *>;
+    meshes = new std::list<std::shared_ptr<Mesh>>;
+    materials = new std::list<std::shared_ptr<Material>>;
 }
 
 Scene::~Scene()
@@ -18,7 +18,7 @@ Scene::~Scene()
     delete meshes;
 }
 
-void Scene::AddMesh(Mesh *mesh)
+void Scene::AddMesh(std::shared_ptr<Mesh> mesh)
 {
     this->meshes->push_back(mesh);
     if(!mesh->GetMaterial())
@@ -36,17 +36,26 @@ void Scene::AddMesh(Mesh *mesh)
     }
 }
 
-void Scene::RemoveMesh(Mesh *mesh)
+void Scene::RemoveMesh(std::shared_ptr<Mesh> mesh)
 {
     this->meshes->remove(mesh);
 }
 
-void Scene::AddMaterial(Material *material)
+void Scene::AddMaterial(std::shared_ptr<Material> material)
 {
     this->materials->push_back(material);
 }
 
-void Scene::RemoveMaterial(Material *material)
+void Scene::RemoveMaterial(std::shared_ptr<Material> material)
 {
     this->materials->remove(material);
+}
+
+
+
+EMSCRIPTEN_BINDINGS(Scene)
+{
+    emscripten::class_<Scene>("Scene")
+        .smart_ptr_constructor("Scene", &std::make_shared<Scene>)
+        .function("GetCamera", &Scene::GetCamera, emscripten::allow_raw_pointers());
 }

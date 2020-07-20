@@ -3,5 +3,6 @@
 
 ColorMaterial::ColorMaterial()
 {
-    shader = new ColorShader();
+    LOG_CONSTRUCTOR();
+    shader = std::make_shared<ColorShader>();
 }

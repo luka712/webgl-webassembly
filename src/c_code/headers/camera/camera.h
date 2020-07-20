@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include "../constants.h"
 #include "../../../../include/glm/mat4x4.hpp"
@@ -46,6 +48,7 @@ public:
                       float far = 100.0f,
                       glm::vec3 pos = glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3 lookAt = glm::vec3(0.0f, 0.0f, -1.0f),
                       glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f));
+    ~PerspectiveCamera();
 
     void Move(glm::vec3 pos) override;
 };

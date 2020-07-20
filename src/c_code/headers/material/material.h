@@ -5,11 +5,11 @@ class Material
 {
 protected:
     unsigned long id;
-    BaseShader *shader;
+    std::shared_ptr<BaseShader> shader;
 
 public:
     Material();
-    BaseShader *GetShader() const { return shader; }
+    std::shared_ptr<BaseShader> GetShader() const { return shader; }
 };
 
 class ColorMaterial : public Material

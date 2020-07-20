@@ -1,4 +1,4 @@
-import { IRenderer } from "./IRenderer";
+import { IRenderer } from "../interfaces/renderer";
 
 export class WasmRenderer implements IRenderer 
 {

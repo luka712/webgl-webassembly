@@ -1,3 +1,4 @@
+
 interface IModule 
 {
     HEAP8: Int8Array;
@@ -11,4 +12,22 @@ interface IModule
     _malloc(ref: number): number;
     cwrap<T>(name: string, returnName: string, parameters: Array<string>): T;
     _free(ref: number): void;
+
+    //#region exports
+
+    SceneManager: WasmExporetedSceneManager;
+
+    //#endregion
+}
+
+
+interface WasmExporetedSceneManager 
+{
+    GetInstance(): WasmExporetedSceneManager;
+    GetCurrent(): WasmExportedScene;
+}
+
+interface WasmExportedScene
+{
+
 }

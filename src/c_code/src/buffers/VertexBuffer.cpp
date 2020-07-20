@@ -2,6 +2,7 @@
 
 VertexBuffer::VertexBuffer(const GLchar *name, const GLint size, const float *data, const int length)
 {
+    LOG_CONSTRUCTOR();
     this->name = name;
     this->data = data;
     this->size = size;
@@ -10,6 +11,7 @@ VertexBuffer::VertexBuffer(const GLchar *name, const GLint size, const float *da
 
 VertexBuffer::VertexBuffer(const GLint location, const GLint size, const float *data, const int length)
 {
+    LOG_CONSTRUCTOR();
     this->attributeLoc = location;
     this->data = data;
     this->size = size;
@@ -19,6 +21,7 @@ VertexBuffer::VertexBuffer(const GLint location, const GLint size, const float *
 
 VertexBuffer::~VertexBuffer()
 {
+    LOG_DESTRUCTOR();
     Unbind();
     DeleteBuffer();
 }
@@ -30,13 +33,14 @@ void VertexBuffer::Initialize(const GLuint program)
     {
         attributeLoc = glGetAttribLocation(program, name);
     }
-    DEBUG_PRINT_FORMAT("Attribute location: %d", attributeLoc);
+    LOG_FORMAT("Attribute location: %d", attributeLoc);
 
     glGenBuffers(1, &buffer);
+    LOG_FORMAT("Generated vertex buffer: %u", buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * length, data, GL_STATIC_DRAW);
 
-    DEBUG_PRINT_FORMAT("Vertex buffer id: %d", buffer);
+    LOG_FORMAT("Vertex buffer id: %d", buffer);
 
     if (buffer <= 0)
     {
@@ -63,5 +67,7 @@ void VertexBuffer::Unbind()
 
 void VertexBuffer::DeleteBuffer()
 {
+    LOG_FORMAT("Destroying vertex buffer: %u", buffer);
     glDeleteBuffers(1, &buffer);
+    LOG_FORMAT("Destroyed vertex buffer: %u", buffer);
 }

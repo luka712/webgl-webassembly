@@ -2,17 +2,21 @@
 
 Renderer::~Renderer()
 {
+    LOG_DESTRUCTOR();
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
 }
 
 bool Renderer::initialized = false;
-Renderer *Renderer::instance;
+std::shared_ptr<Renderer>  Renderer::instance;
 
-Renderer *Renderer::GetInstance()
+std::shared_ptr<Renderer>  Renderer::GetInstance()
 {
     if (Renderer::initialized == false)
     {
         Renderer::initialized = true;
-        instance = new Renderer();
+        instance = std::make_shared<Renderer>();
     }
     return instance;
 }
@@ -25,19 +29,19 @@ void Renderer::Initialize(int width, int height)
     // version needs to be setup before renderer creationg
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-    // not the SDL_WINDOW_OPENGL flag
+    // note the SDL_WINDOW_OPENGL flag
+    LOG("Calling SDL_CreateWindowAndRenderer.");
     SDL_CreateWindowAndRenderer(width, height, SDL_WINDOW_OPENGL, &window, &renderer);
 
-    gl_context = SDL_GL_CreateContext(window);
+    SDL_GL_CreateContext(window);
 
-    DEBUG_PRINT_FORMAT("GLVersion = %s\n", glGetString(GL_VERSION));
-    DEBUG_PRINT_FORMAT("vendor = %s\nrenderer = %s\n", glGetString(GL_VENDOR), glGetString(GL_RENDERER));
+    LOG_FORMAT("GL Version: %s\n", glGetString(GL_VERSION));
+    LOG_FORMAT("Vendor: %s renderer = %s\n", glGetString(GL_VENDOR), glGetString(GL_RENDERER));
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
+    glEnable(GL_DEPTH_TEST);
 }
 
-void Renderer::AddShader(BaseShader *shader)
+void Renderer::AddShader(std::shared_ptr<BaseShader> shader)
 {
     shaders.push_back(shader);
 }

@@ -25,8 +25,8 @@ private:
     GLuint vertexShader;
     GLuint fragmentShader;
     GLuint vao;
-    IndexBuffer *indexBuffer;
-    std::list<VertexBuffer *> vertexBuffers;
+    std::shared_ptr<IndexBuffer> indexBuffer;
+    std::list<std::shared_ptr<VertexBuffer>> vertexBuffers;
 
     std::map<std::string, GLint> uniformLocationsLookup;
     std::map<GLint, glm::mat4> uniformMat4Lookup;
@@ -46,12 +46,12 @@ public:
     bool IsCompiled() const { return isCompiled; }
     int GetLength() const { return length; }
 
-    IndexBuffer *GetIndexBuffer() const { return indexBuffer; }
+    std::shared_ptr<IndexBuffer> GetIndexBuffer() const { return indexBuffer; }
 
     void Compile(const char *vertexShaderSource, const char *fragmentShaderSource);
 
-    void AddVertexBuffer(VertexBuffer *vertexBuffer);
-    void AddIndexBuffer(IndexBuffer *indexBuffer);
+    void AddVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer);
+    void AddIndexBuffer(std::shared_ptr<IndexBuffer> indexBuffer);
     
     void UseProgram();
     void StopProgram();

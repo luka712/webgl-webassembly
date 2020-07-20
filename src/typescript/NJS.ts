@@ -1,7 +1,7 @@
 import { WasmRenderer } from "./renderer/WasmRenderer";
-import { IFileManager } from "./io/IFIleManager";
+import { IFileManager } from "./interfaces/file";
 import { WasmFileManager } from "./io/WasmFileManager";
-import { IRenderer } from "./renderer/IRenderer";
+import { IRenderer } from "./interfaces/renderer";
 
 export class NJS
 {

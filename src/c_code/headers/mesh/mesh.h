@@ -7,7 +7,6 @@
 #include "../transform/transform.h"
 #include "../material/material.h"
 
-
 //TODO: Move buffer data to geometry class it should be like this -> Renderable object -> Mesh -> (Geometry, Material)
 
 /*
@@ -18,39 +17,38 @@
  * @brief  The mesh
  * @note   Mesh is abstraction which contains VertexBuffers and IndexBuffer.
  */
-class Mesh
+class Mesh : public std::enable_shared_from_this<Mesh>
 {
 
 private:
     unsigned long id = 1;
 
 protected:
-    Material *material;
-    std::list<VertexBuffer *> *vbuffers;
-    IndexBuffer *ibuffer;
-    Transform *transform;
+    std::shared_ptr<Material> material;
+    std::list<std::shared_ptr<VertexBuffer>> *vbuffers;
+    std::shared_ptr<IndexBuffer> ibuffer;
+    std::shared_ptr<Transform> transform;
     bool isCompiled;
 
     void SetupMaterialAndMoveToScene();
 
 public:
     Mesh();
-    Mesh(VertexBuffer *vbuffer, IndexBuffer *ibuffer);
+    Mesh(std::shared_ptr<VertexBuffer> vbuffer, std::shared_ptr<IndexBuffer> ibuffer);
     ~Mesh();
-    IndexBuffer *GetIndexBuffer() const { return ibuffer; }
+    std::shared_ptr<IndexBuffer> GetIndexBuffer() const { return ibuffer; }
     void BindBuffers();
     void UnbindBuffers();
     void UseShader();
     void StopShader();
 
-
     //TODO: MOVE TRANSOFRM TO RENDERABLE
-    Transform *GetTransform() { return transform; }
+    std::shared_ptr<Transform> GetTransform() { return transform; }
     void Translate(float x, float y, float z);
     void Scale(float x, float y, float z);
     void Rotation(float x, float y, float z);
-    Material *GetMaterial() { return material; }
-    void SetMaterial(Material *mat) { material = mat; }
+    std::shared_ptr<Material> GetMaterial() { return material; }
+    void SetMaterial(std::shared_ptr<Material> mat) { material = mat; }
 };
 
 class QuadMesh : public Mesh
@@ -59,7 +57,8 @@ public:
     QuadMesh();
 };
 
-class CubeMesh: public Mesh {
-    public:
-        CubeMesh();
+class CubeMesh : public Mesh
+{
+public:
+    CubeMesh();
 };

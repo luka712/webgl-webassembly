@@ -5,16 +5,16 @@
 
 Mesh::Mesh()
 {
-    this->transform = new Transform();
+    this->transform = std::make_shared<Transform>();
 }
 
-Mesh::Mesh(VertexBuffer *vb, IndexBuffer *ib) : Mesh()
+Mesh::Mesh(std::shared_ptr<VertexBuffer> vb, std::shared_ptr<IndexBuffer> ib) : Mesh()
 {
-    this->vbuffers = new std::list<VertexBuffer *>;
+    this->vbuffers = new std::list<std::shared_ptr<VertexBuffer>>;
     this->vbuffers->push_back(vb);
     this->ibuffer = ib;
 
-    SceneManager::GetInstance()->GetCurrentScene()->AddMesh(this);
+    SceneManager::GetInstance()->GetCurrentScene()->AddMesh(shared_from_this());
 }
 
 Mesh::~Mesh()
@@ -28,32 +28,34 @@ Mesh::~Mesh()
     // delete ibuffer;
 
     auto meshes = SceneManager::GetInstance()->GetCurrentScene()->GetMeshes();
-    meshes->remove(this);
 }
 
 void Mesh::SetupMaterialAndMoveToScene()
 {
+    LOG("SetupMaterialAndMoveToScene called.");
     material = SceneManager::GetInstance()->GetCurrentScene()->GetMaterials()->front();
 
     if (!material->GetShader()->IsCompiled())
     {
-        DEBUG_PRINT("Shader is not compiled\n");
+        LOG("Shader is not compiled\n");
         throw std::runtime_error(std::string("Shader is not compiled. QuadMesh"));
     }
     material->GetShader()->AddVertexBuffer(vbuffers->front());
     if (!vbuffers->front()->IsBound())
     {
-        DEBUG_PRINT("Vertex buffer is not bound.\n");
+        LOG("Vertex buffer is not bound.\n");
         throw std::runtime_error(std::string("Vertex buffer is not bound. QuadMesh"));
     }
     material->GetShader()->AddIndexBuffer(ibuffer);
     if (!ibuffer->IsBound())
     {
-        DEBUG_PRINT("Vertex buffer is not bound.\n");
+        LOG("Vertex buffer is not bound.\n");
         throw std::runtime_error(std::string("Index buffer is not bound. QuadMesh"));
     }
 
-    SceneManager::GetInstance()->GetCurrentScene()->AddMesh(this);
+    LOG("Trying to add mesh.");// TODO: Fails here 
+    // SceneManager::GetInstance()->GetCurrentScene()->AddMesh(shared_from_this());
+    LOG("SetupMaterialAndMoveToScene finished.");
 }
 
 void Mesh::BindBuffers()
@@ -116,7 +118,7 @@ EMSCRIPTEN_BINDINGS(Mesh)
 {
 
     emscripten::class_<Mesh>("Mesh")
-        .constructor()
+        .smart_ptr_constructor("Mesh", &std::make_shared<Mesh>)
         .function("Translate", &Mesh::Translate)
         .function("Scale", &Mesh::Scale)
         .function("Rotation", &Mesh::Rotation)

@@ -4,25 +4,26 @@
 #include "../camera/camera.h"
 #include "../mesh/mesh.h"
 
+
 class Scene
 {
 private:
-    std::list<Mesh *> *meshes;
-    std::list<Material *> *materials;
-    Camera *camera;
+    std::list<std::shared_ptr<Mesh>> *meshes;
+    std::list<std::shared_ptr<Material>> *materials;
+    std::shared_ptr<Camera> camera;
 
 public:
     Scene();
     ~Scene();
 
-    std::list<Mesh *> *GetMeshes() { return meshes; };
-    std::list<Material *> *GetMaterials() { return materials; }
+    std::list<std::shared_ptr<Mesh>> *GetMeshes() { return meshes; };
+    std::list<std::shared_ptr<Material>> *GetMaterials() { return materials; }
 
-    Camera *GetCamera() { return camera; }
-    void SetCamera(Camera *cam) { this->camera = cam; }
+    std::shared_ptr<Camera> GetCamera() { return camera; }
+    void SetCamera(std::shared_ptr<Camera> cam) { this->camera = cam; }
 
-    void AddMesh(Mesh *mesh);
-    void RemoveMesh(Mesh *mesh);
-    void AddMaterial(Material *material);
-    void RemoveMaterial(Material *material);
+    void AddMesh(std::shared_ptr<Mesh> mesh);
+    void RemoveMesh(std::shared_ptr<Mesh> mesh);
+    void AddMaterial(std::shared_ptr<Material> material);
+    void RemoveMaterial(std::shared_ptr<Material> material);
 };

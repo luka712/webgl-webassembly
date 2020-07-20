@@ -5,6 +5,7 @@
 
 ColorShader::ColorShader()
 {
+    LOG_CONSTRUCTOR();
     // get and load shaders
     auto source = BaseShader::GetSourceFromPath(COLOR_SHADER_PATH);
     Compile(source.vertexSource.c_str(), source.fragmentSource.c_str());
@@ -26,6 +27,7 @@ ColorShader::ColorShader()
 
 ColorShader::~ColorShader()
 {
+    LOG_DESTRUCTOR();
     DestroyShader();
 }
 

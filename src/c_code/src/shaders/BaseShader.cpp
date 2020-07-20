@@ -4,10 +4,12 @@
 
 BaseShader::BaseShader()
 {
+    LOG_CONSTRUCTOR();
 }
 
 BaseShader::~BaseShader()
 {
+    LOG_DESTRUCTOR();
     this->DestroyShader();
 }
 
@@ -91,32 +93,48 @@ void BaseShader::Compile(const char *vertexShaderSource, const char *fragmentSha
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
 
+    glGenVertexArrays(1, &vao);
+    LOG_FORMAT("Bound vao: %u", vao);
+    glBindVertexArray(0);
     this->isCompiled = true;
+
+    
 }
 
-void BaseShader::AddVertexBuffer(VertexBuffer *buffer)
+void BaseShader::AddVertexBuffer(std::shared_ptr<VertexBuffer>buffer)
 {
     glUseProgram(program);
+
+    glBindVertexArray(vao);
+    LOG_FORMAT("Binding vao: %u", vao);
     buffer->Initialize(program);
+    glBindVertexArray(0);
     vertexBuffers.push_back(buffer);
+    LOG_FORMAT("VBO verex %u initialized", buffer->GetBuffer());
 }
 
-void BaseShader::AddIndexBuffer(IndexBuffer *buffer)
+void BaseShader::AddIndexBuffer(std::shared_ptr<IndexBuffer>buffer)
 {
     glUseProgram(program);
+    LOG_FORMAT("Binding vao: %u", vao);
+    glBindVertexArray(vao);
     buffer->Initialize(program);
+    glBindVertexArray(0);
     indexBuffer = buffer;
     length = indexBuffer->GetLength();
+    LOG_FORMAT("VBO index %u initialized", buffer->GetBuffer());
 }
 
 void BaseShader::UseProgram()
 {
     if (this->IsCompiled())
     {
-        for (auto const &vb : vertexBuffers)
-        {
-            vb->Bind();
-        }
+        // for (auto const &vb : vertexBuffers)
+        // {
+        //     vb->Bind();
+        // }
+        // indexBuffer->Bind();
+        glBindVertexArray(vao);
         indexBuffer->Bind();
         glUseProgram(program);
 
@@ -133,6 +151,9 @@ void BaseShader::UseProgram()
         {
             glUniformMatrix4fv(it->first, 1, GL_FALSE, glm::value_ptr(it->second));
         }
+
+        glBindVertexArray(0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 }
 
@@ -140,11 +161,6 @@ void BaseShader::StopProgram()
 {
     if (this->IsCompiled())
     {
-        for (auto const &vb : vertexBuffers)
-        {
-            vb->Unbind();
-        }
-        indexBuffer->Unbind();
         glUseProgram(0);
     }
 }
@@ -215,8 +231,8 @@ const ShaderSource BaseShader::GetSourceFromPath(const char *filename)
         fragment_source = fragment_source.substr(f_start);
     }
 
-    DEBUG_PRINT(vertex_source.c_str());
-    DEBUG_PRINT(fragment_source.c_str());
+    LOG(vertex_source.c_str());
+    LOG(fragment_source.c_str());
 
     return {vertex_source, fragment_source};
 };

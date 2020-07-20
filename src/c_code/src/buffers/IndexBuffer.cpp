@@ -2,12 +2,14 @@
 
 IndexBuffer::IndexBuffer(const GLuint *data, const int length)
 {
+    LOG_CONSTRUCTOR();
     this->data = data;
     this->length = length;
 }
 
 IndexBuffer::~IndexBuffer()
 {
+    LOG_DESTRUCTOR();
     Unbind();
     DeleteBuffer();
 }
@@ -15,6 +17,7 @@ IndexBuffer::~IndexBuffer()
 void IndexBuffer::Initialize(const GLuint program)
 {
     glGenBuffers(1, &buffer);
+    LOG_FORMAT("Generated index buffer: %u", buffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, length * sizeof(unsigned int), data, GL_STATIC_DRAW);
 
@@ -38,5 +41,7 @@ void IndexBuffer::Unbind()
 
 void IndexBuffer::DeleteBuffer()
 {
+    LOG_FORMAT("Destroying index buffer: %d", buffer);
     glDeleteBuffers(1, &buffer);
+    LOG_FORMAT("Destroyed index buffer: %d", buffer);
 }

@@ -33,8 +33,6 @@ void Initialize();
 void Load();
 void draw();
 
-BaseShader *shader;
-
 int main()
 {
     Initialize();
@@ -50,6 +48,12 @@ void Initialize()
 
     // 2. After renderer scene manager is to be initialized.
     SceneManager::GetInstance()->Initialize();
+
+    auto cb = [](std::shared_ptr<Scene> scene) -> void {
+        printf("Scene created callback\n");
+    };
+    SceneManager::GetInstance()->GetEventDispatcher()->registerEvent(new Event<std::shared_ptr<Scene>>(EventType::SceneManagerInitialized, cb));
+    SceneManager::GetInstance()->GetEventDispatcher()->dispatchEvent(EventType::SceneManagerInitialized, SceneManager::GetInstance()->GetCurrentScene());
 }
 
 void Load()
@@ -113,7 +117,7 @@ extern "C" void set_shader_matrix4(char *name, float *matrix)
 {
     // TODO: implement setting up of matrix from JS code
     glm::mat4 orthographic = glm::ortho(0.f, 800.f, 600.f, 0.f, 0.1f, 100.0f);
-    shader->SetMatrix4("u_projection", orthographic);
+    // shader->SetMatrix4("u_projection", orthographic);
 }
 
 #pragma region Exports
