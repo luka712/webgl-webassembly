@@ -1,3 +1,4 @@
+#pragma once
 
 #include <vector>
 #include <map>
@@ -19,57 +20,54 @@ public:
 template <typename... args>
 class Event : public IEvent
 {
-    private:
-    //Event identifier
+private:
     EventType type;
-    //Event callback - can't be changed inside event.
-    const std::function<void(args...)>  callback;
+    const std::function<void(args...)> callback;
+
 public:
+    explicit Event(EventType t, const std::function<void(args...)> &cb) : type(t), callback(cb) {}
 
-    //Ctor & Dtor
-    //template< typename T_CB >
-    explicit Event(EventType t, const std::function<void(args...)>  &cb) : type(t), callback(cb) {}
-    ~Event() {}
-
-    //Accessors
     virtual const EventType GetType() const override { return this->type; }
-
-    //Methods
     void trigger(args... a) { this->callback(a...); }
 };
 
 class EventDispatcher
 {
+private:
+    std::map<EventType, std::vector<IEvent *>> eventList;
+
 public:
     EventDispatcher() {}
     ~EventDispatcher()
     {
-        for (auto el : _eventList)
-        {
-            for (auto e : el.second)
-                delete e;
-        }
+        // for(auto &[key, events] : eventList)
+        // {
+        //     for (auto e : events)
+        //     {
+        //        //  delete e;
+        //     }
+        //     events.empty();
+        // }
+        // eventList.empty();
     }
 
     void registerEvent(IEvent *event)
     {
         if (event)
-            _eventList[event->GetType()].push_back(event);
+            eventList[event->GetType()].push_back(event);
     }
 
-    template <typename... _args>
-    void dispatchEvent(EventType eventType, _args... a)
+    template <typename... args>
+    void dispatchEvent(EventType eventType, args... a)
     {
-        auto it_eventList = _eventList.find(eventType);
-        if (it_eventList == _eventList.end())
+        auto it = eventList.find(eventType);
+        if (it == eventList.end())
             return;
-        for (auto ie : it_eventList->second)
+
+        for (auto ie : it->second)
         {
-            if (Event<_args...> *event = dynamic_cast<Event<_args...> *>(ie))
+            if (Event<args...> *event = dynamic_cast<Event<args...> *>(ie))
                 event->trigger(a...);
         }
     }
-
-private:
-    std::map<EventType, std::vector<IEvent *>> _eventList;
 };

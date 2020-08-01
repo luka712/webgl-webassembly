@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <stdio.h>
 #include <vector>
@@ -6,11 +6,11 @@
 #include <list>
 #include <string>
 
-#include "../../../include/glm/mat4x4.hpp"
-#include "../../../include/glm/matrix.hpp"
-#include "../../../include/glm/ext.hpp"
-#include "../headers/constants.h"
-#include "../headers/buffers/buffers.h"
+#include "../../../../../../include/glm/mat4x4.hpp"
+#include "../../../../../../include/glm/matrix.hpp"
+#include "../../../../../../include/glm/ext.hpp"
+#include "../../../../headers/constants.h"
+#include "../../../../headers/mesh/geometry/buffers/buffers.h"
 
 struct ShaderSource
 {
@@ -18,48 +18,40 @@ struct ShaderSource
     std::string fragmentSource;
 };
 
-class BaseShader
+class BaseShader : public IId
 {
 private:
     GLuint program;
     GLuint vertexShader;
     GLuint fragmentShader;
-    GLuint vao;
-    std::shared_ptr<IndexBuffer> indexBuffer;
-    std::list<std::shared_ptr<VertexBuffer>> vertexBuffers;
 
     std::map<std::string, GLint> uniformLocationsLookup;
     std::map<GLint, glm::mat4> uniformMat4Lookup;
     std::map<GLint, glm::vec4> uniformFloat4Lookup;
 
     int length;
-    bool isCompiled;
 
+protected:
+    bool isCompiled;
     GLuint CompileShader(const GLenum type, const char *source);
 
 public:
-    BaseShader();
+    BaseShader(std::string id);
     ~BaseShader();
 
     GLuint GetProgram() const { return program; }
 
     bool IsCompiled() const { return isCompiled; }
-    int GetLength() const { return length; }
-
-    std::shared_ptr<IndexBuffer> GetIndexBuffer() const { return indexBuffer; }
 
     void Compile(const char *vertexShaderSource, const char *fragmentShaderSource);
 
-    void AddVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer);
-    void AddIndexBuffer(std::shared_ptr<IndexBuffer> indexBuffer);
-    
     void UseProgram();
     void StopProgram();
     void DestroyShader();
 
     void SetUniform4f(char *uniform, float r, float g, float b, float a);
     void SetUniform4fv(char *uniform, glm::vec4 const &vec);
-    void SetMatrix4(const char *uniform, glm::mat4 const matrix);
+    void SetMatrix4(const char *uniform, glm::mat4 const &matrix);
 
     static const ShaderSource GetSourceFromPath(const char *filepath);
 };

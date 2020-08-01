@@ -23,6 +23,9 @@ wasm build commands are located in _build.bat file. Some notable errors:
 
 
 ### TODO: 
+* add id, use maps
 * use smart pointers 
 * use vector list
-* explore use of inline function
+* events
+* component pattern
+* layers

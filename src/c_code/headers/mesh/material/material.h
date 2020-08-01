@@ -1,14 +1,14 @@
 
-#include "../shader.h"
+#include "shader/shader.h"
 
 class Material
 {
 protected:
-    unsigned long id;
+    std::string id;
     std::shared_ptr<BaseShader> shader;
 
 public:
-    Material();
+    Material(std::string id);
     std::shared_ptr<BaseShader> GetShader() const { return shader; }
 };
 

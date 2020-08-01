@@ -2,60 +2,45 @@
 
 #include "../../headers/scene/scene.h"
 
-Scene::Scene()
+Scene::Scene(std::string id)
 {
-    meshes = new std::list<std::shared_ptr<Mesh>>;
-    materials = new std::list<std::shared_ptr<Material>>;
+    this->id = id;
 }
 
 Scene::~Scene()
 {
-    for (auto m = meshes->begin(); m != meshes->end(); ++m)
+    for (auto const &[key, val] : meshes)
     {
-        delete &m;
-    }
-
-    delete meshes;
-}
-
-void Scene::AddMesh(std::shared_ptr<Mesh> mesh)
-{
-    this->meshes->push_back(mesh);
-    if(!mesh->GetMaterial())
-    {
-        auto mat = materials->front();
-        if(mat)
-        {
-            mesh->SetMaterial(mat);
-        }
-        else 
-        {
-            printf("Scene has no material definition defined. Make sure that scene has at least one material definition before creating the material.\n");
-            //throw std::runtime_error(std::string("Scene has no material definition defined. Make sure that scene has at least one material definition before creating the material."));
-        }
+        delete &key;
+        delete &val;
     }
 }
 
-void Scene::RemoveMesh(std::shared_ptr<Mesh> mesh)
+void Scene::AddObject(SceneObject* obj)
 {
-    this->meshes->remove(mesh);
+    objects.emplace_back(std::shared_ptr<SceneObject>(obj));
 }
 
-void Scene::AddMaterial(std::shared_ptr<Material> material)
+void Scene::AddMesh(Mesh* mesh, bool overrideExisting)
 {
-    this->materials->push_back(material);
+    auto exists = meshes.find(mesh->id) != meshes.end();
+    if (!exists || overrideExisting)
+    {
+        auto meshPtr = std::shared_ptr<Mesh>(mesh);
+        meshes.emplace(mesh->id, meshPtr);
+        // conditional log
+        // LOG_FORMAT("Mesh with id %s already added!", mesh->id);
+    }
 }
 
-void Scene::RemoveMaterial(std::shared_ptr<Material> material)
+void Scene::RemoveMesh(std::string id)
 {
-    this->materials->remove(material);
+    this->meshes.erase(id);
 }
-
-
 
 EMSCRIPTEN_BINDINGS(Scene)
 {
     emscripten::class_<Scene>("Scene")
-        .smart_ptr_constructor("Scene", &std::make_shared<Scene>)
+        .smart_ptr_constructor("Scene", &std::make_shared<Scene, std::string>)
         .function("GetCamera", &Scene::GetCamera, emscripten::allow_raw_pointers());
 }

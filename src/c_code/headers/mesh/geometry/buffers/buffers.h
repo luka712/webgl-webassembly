@@ -2,13 +2,13 @@
 
 #include <GLES3/gl3.h>
 #include <stdio.h>
-#include "../constants.h"
+#include "../../../constants.h"
 
 /**
  * @brief  The vertex buffer
  * @note   Lowest possibe buffer entry which goes directly over to GPU. It is used to build a mesh.
  */
-class VertexBuffer
+class VertexBuffer : public IId
 {
 private:
     const GLchar *name;
@@ -29,7 +29,7 @@ public:
      * @param  *data: vertices data.
      * @param  length: length of data.
      */
-    VertexBuffer(const GLchar *name, const GLint size, const float *data, const int length);
+    VertexBuffer(std::string id, const GLchar *name, const GLint size, const float *data, const int length);
     /**
      * @brief  Vertex buffer constructor.
      * @note   Constructor for vertex buffer
@@ -39,7 +39,7 @@ public:
      * @param  length: length of data.: 
      * @retval 
      */
-    VertexBuffer(const GLint location, const GLint size, const float *data, const int length);
+    VertexBuffer(std::string id, const GLint location, const GLint size, const float *data, const int length);
     ~VertexBuffer();
     GLuint GetBuffer() const { return this->buffer; };
     bool IsBound() const { return isBound; }
@@ -53,13 +53,14 @@ public:
  * @brief  The index buffer.
  * @note   Lowest possibe index buffer entry which goes directly over to GPU. It is used to build a mesh.
  */
-class IndexBuffer 
+class IndexBuffer : public IId
 {
 private:
     const GLuint *data;
     int length;
     GLuint buffer;
     bool isBound = false;
+
 
 public:
     /**
@@ -69,7 +70,7 @@ public:
      * @param  length: length of data.
      * @retval 
      */
-    IndexBuffer(const GLuint *data, const int length);
+    IndexBuffer(std::string id, const GLuint *data, const int length);
     ~IndexBuffer();
     GLuint GetBuffer() const { return this->buffer; };
     bool IsBound() const { return isBound; }
@@ -90,7 +91,7 @@ private:
         0.5, 0.5, 0.0};
 
 public:
-    QuadVertexBuffer() : VertexBuffer(0, 3, data, 12){};
+    QuadVertexBuffer() : VertexBuffer("quad_positon_data", 0, 3, data, 12){};
 };
 
 class QuadIndexBuffer : public IndexBuffer
@@ -101,7 +102,7 @@ private:
         1, 3, 2};
 
 public:
-    QuadIndexBuffer() : IndexBuffer(data, 6) {}
+    QuadIndexBuffer() : IndexBuffer("quad_indices_data", data, 6) {}
 };
 
 class CubeVertexBuffer : public VertexBuffer
@@ -119,7 +120,7 @@ class CubeVertexBuffer : public VertexBuffer
         -0.5, 0.5, -0.5};
 
 public:
-    CubeVertexBuffer() : VertexBuffer(0, 3, data, 24){};
+    CubeVertexBuffer() : VertexBuffer("cube_position_data", 0, 3, data, 24){};
 };
 
 class CubeIndexBuffer : public IndexBuffer
@@ -145,5 +146,5 @@ class CubeIndexBuffer : public IndexBuffer
         6, 7, 3};
 
 public:
-    CubeIndexBuffer() : IndexBuffer(data, 36){};
+    CubeIndexBuffer() : IndexBuffer("cube_indices_data", data, 36){};
 };

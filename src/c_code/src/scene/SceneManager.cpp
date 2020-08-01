@@ -31,16 +31,7 @@ void SceneManager::Initialize()
 
     this->dispatcher = std::make_shared<EventDispatcher>();
 
-    this->current = std::make_shared<Scene>();
-
-    auto camera = std::make_shared<PerspectiveCamera>();
-    this->current->SetCamera(camera);
-
-    auto material = std::make_shared<ColorMaterial>();
-    this->current->AddMaterial(material);
-    
-    auto mesh = std::make_shared<CubeMesh>();
-    this->current->AddMesh(mesh);
+    this->current = std::make_shared<Scene>("default");
 
     this->dispatcher->dispatchEvent(EventType::SceneManagerInitialized, current);
 
@@ -49,12 +40,13 @@ void SceneManager::Initialize()
 
 void SceneManager::AddScene(std::shared_ptr<Scene> scene)
 {
-    scenes->push_back(scene);
+    scenes->emplace(scene->id, scene);
 }
 
 void SceneManager::RemoveScene(std::shared_ptr<Scene> scene)
 {
-    scenes->remove(scene);
+    // TODO: should it be destroyed
+    scenes->erase(scene->id);
 }
 
 EMSCRIPTEN_BINDINGS(SceneManager)

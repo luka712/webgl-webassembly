@@ -1,10 +1,11 @@
+import { ICamera } from "./camera";
+
 export interface ISceneManager 
 {
     readonly current: IScene;
-    readonly scenes: Array<IScene>;
 }
 
 export interface IScene 
 {
-
+    getCamera<T extends ICamera>(): T;
 }

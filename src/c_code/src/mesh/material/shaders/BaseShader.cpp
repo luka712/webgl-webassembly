@@ -1,9 +1,9 @@
+#include "../../../../headers/mesh/material//shader/shader.h"
+#include "../../../../headers/io/filemanger.h"
 
-#include "../../headers/shader.h"
-#include "../../headers/io/filemanger.h"
-
-BaseShader::BaseShader()
+BaseShader::BaseShader(std::string id)
 {
+    this->id = id;
     LOG_CONSTRUCTOR();
 }
 
@@ -93,49 +93,15 @@ void BaseShader::Compile(const char *vertexShaderSource, const char *fragmentSha
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
 
-    glGenVertexArrays(1, &vao);
-    LOG_FORMAT("Bound vao: %u", vao);
-    glBindVertexArray(0);
     this->isCompiled = true;
 
-    
-}
-
-void BaseShader::AddVertexBuffer(std::shared_ptr<VertexBuffer>buffer)
-{
-    glUseProgram(program);
-
-    glBindVertexArray(vao);
-    LOG_FORMAT("Binding vao: %u", vao);
-    buffer->Initialize(program);
-    glBindVertexArray(0);
-    vertexBuffers.push_back(buffer);
-    LOG_FORMAT("VBO verex %u initialized", buffer->GetBuffer());
-}
-
-void BaseShader::AddIndexBuffer(std::shared_ptr<IndexBuffer>buffer)
-{
-    glUseProgram(program);
-    LOG_FORMAT("Binding vao: %u", vao);
-    glBindVertexArray(vao);
-    buffer->Initialize(program);
-    glBindVertexArray(0);
-    indexBuffer = buffer;
-    length = indexBuffer->GetLength();
-    LOG_FORMAT("VBO index %u initialized", buffer->GetBuffer());
+    LOG_FORMAT("Shader compiled %d", program);
 }
 
 void BaseShader::UseProgram()
 {
     if (this->IsCompiled())
     {
-        // for (auto const &vb : vertexBuffers)
-        // {
-        //     vb->Bind();
-        // }
-        // indexBuffer->Bind();
-        glBindVertexArray(vao);
-        indexBuffer->Bind();
         glUseProgram(program);
 
         for (auto it = this->uniformFloat4Lookup.begin(); it != this->uniformFloat4Lookup.end(); ++it)
@@ -151,9 +117,6 @@ void BaseShader::UseProgram()
         {
             glUniformMatrix4fv(it->first, 1, GL_FALSE, glm::value_ptr(it->second));
         }
-
-        glBindVertexArray(0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 }
 
@@ -167,11 +130,6 @@ void BaseShader::StopProgram()
 
 void BaseShader::DestroyShader()
 {
-    for (auto const &vb : vertexBuffers)
-    {
-        vb->DeleteBuffer();
-    }
-    indexBuffer->DeleteBuffer();
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
     glDeleteProgram(program);
@@ -191,7 +149,7 @@ void BaseShader::SetUniform4fv(char *uniform, glm::vec4 const &v)
     this->uniformFloat4Lookup[this->uniformLocationsLookup[uniform]] = v;
 }
 
-void BaseShader::SetMatrix4(const char *uniform, glm::mat4 const v)
+void BaseShader::SetMatrix4(const char *uniform, glm::mat4 const &v)
 {
     if (!this->uniformLocationsLookup.count(uniform))
     {

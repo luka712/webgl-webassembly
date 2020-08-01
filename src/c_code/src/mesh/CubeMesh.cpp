@@ -1,21 +1,22 @@
-#include "../../headers/scene/scenemanager.h"
 #include "../../headers/mesh/mesh.h"
 
-CubeMesh::CubeMesh() : Mesh()
+CubeMesh::CubeMesh(std::string id) : Mesh(id)
 {
     LOG_CONSTRUCTOR();
-
-    this->vbuffers = new std::list<std::shared_ptr<VertexBuffer>>;
-    auto vbuffer = std::make_shared<CubeVertexBuffer>();
-    vbuffers->push_back(vbuffer);
-    ibuffer = std::make_shared<CubeIndexBuffer>();
-
-    SetupMaterialAndMoveToScene();
+    geometry = std::make_shared<CubeGeometry>();
+    material = std::make_shared<ColorMaterial>();
 }
 
-EMSCRIPTEN_BINDINGS(CubeMesh)
+CubeMesh::CubeMesh() : Mesh("cube_mesh")
 {
-
-    emscripten::class_<CubeMesh, emscripten::base<Mesh>>("CubeMesh")
-        .smart_ptr_constructor("CubeMesh", &std::make_shared<CubeMesh>);
+    LOG_CONSTRUCTOR();
+    geometry = std::make_shared<CubeGeometry>();
+    material = std::make_shared<ColorMaterial>();
 }
+
+// EMSCRIPTEN_BINDINGS(CubeMesh)
+// {
+
+//     emscripten::class_<CubeMesh, emscripten::base<Mesh>>("CubeMesh")
+//         .smart_ptr_constructor("CubeMesh", &std::make_shared<CubeMesh>);
+// }

@@ -1,23 +1,21 @@
-#include "../../headers/buffers/buffers.h"
+#include "../../../../headers/mesh/geometry/buffers/buffers.h"
 
-VertexBuffer::VertexBuffer(const GLchar *name, const GLint size, const float *data, const int length)
+VertexBuffer::VertexBuffer(std::string id, const GLchar *name, const GLint size, const float *data, const int length)
+    : name(name), size(size), length(length)
 {
-    LOG_CONSTRUCTOR();
-    this->name = name;
+    this->id = id;
     this->data = data;
-    this->size = size;
-    this->length = length;
+    LOG_CONSTRUCTOR();
 }
 
-VertexBuffer::VertexBuffer(const GLint location, const GLint size, const float *data, const int length)
+VertexBuffer::VertexBuffer(std::string id, const GLint location, const GLint size, const float *data, const int length)
+    : size(size), length(length)
 {
-    LOG_CONSTRUCTOR();
+    this->id = id;
+    this->data = data;
     this->attributeLoc = location;
-    this->data = data;
-    this->size = size;
-    this->length = length;
+    LOG_CONSTRUCTOR();
 }
-
 
 VertexBuffer::~VertexBuffer()
 {
@@ -29,7 +27,7 @@ VertexBuffer::~VertexBuffer()
 void VertexBuffer::Initialize(const GLuint program)
 {
     // meaning it was not bound. attribute location can be passed in case where shader has layout(location = {location}) on attribute
-    if(attributeLoc < 0)
+    if (attributeLoc < 0)
     {
         attributeLoc = glGetAttribLocation(program, name);
     }

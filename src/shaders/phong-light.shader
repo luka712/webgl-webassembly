@@ -17,11 +17,15 @@ FRAGMENT_SHADER
 
 precision mediump float;
 
-uniform vec4 u_color;
+uniform float u_ambient_strength;
+uniform vec3 u_ambient_color;
+
+uniform vec4 u_diffuse;
 
 out vec4 color;
 
 void main()
 {
-    color = u_color;
+    vec3 ambient = u_ambient_strength * u_ambient_color;
+    color = vec3(u_diffuse.xyz * ambient, 1.0);
 }

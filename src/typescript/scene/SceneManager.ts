@@ -4,6 +4,7 @@ import { ISceneManager, IScene } from '../interfaces/scene';
 export class SceneManager implements ISceneManager
 {
     private readonly _instance: WasmExporetedSceneManager;
+    private readonly _scene: IScene;
 
     constructor(private _module: IModule)
     {
@@ -12,8 +13,7 @@ export class SceneManager implements ISceneManager
 
     public get current(): IScene
     {
-        // translate 
-        return this._instance.GetCurrent() as IScene;
+        const wasmScene = this._instance.GetCurrent();
+        
     }
-    scenes: import("../interfaces/scene").IScene[];
 }

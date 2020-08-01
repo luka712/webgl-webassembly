@@ -2,6 +2,11 @@
 #include <emscripten\bind.h>
 #include <memory>
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
+
+#include "id.h"
+
 #define DEBUG
 
 #ifdef DEBUG
@@ -23,4 +28,4 @@
 #define DEFAULT_FOV 60
 
 #define COLOR_SHADER_PATH  "/src/shaders/uniform-color.shader"
-
+#define NO_TRANSFORM_COLOR_SHADER_PATH "/src/shaders/no-transform-color.shader"

@@ -1,29 +1,32 @@
 #pragma once
 
-#include <list>
+
+#include <map>
 #include "../camera/camera.h"
 #include "../mesh/mesh.h"
+#include "../scene/sceneobject.h"
 
 
-class Scene
+class Scene : public IId
 {
 private:
-    std::list<std::shared_ptr<Mesh>> *meshes;
-    std::list<std::shared_ptr<Material>> *materials;
-    std::shared_ptr<Camera> camera;
+    std::map<std::string, std::shared_ptr<Mesh>> meshes;
+    std::shared_ptr<BaseCamera> camera;
+    std::vector<std::shared_ptr<SceneObject>> objects;
 
 public:
-    Scene();
+    Scene(std::string id);
     ~Scene();
 
-    std::list<std::shared_ptr<Mesh>> *GetMeshes() { return meshes; };
-    std::list<std::shared_ptr<Material>> *GetMaterials() { return materials; }
+    std::vector<std::shared_ptr<SceneObject>> GetObjects() const { return objects; }
+    void AddObject(SceneObject *obj);
 
-    std::shared_ptr<Camera> GetCamera() { return camera; }
-    void SetCamera(std::shared_ptr<Camera> cam) { this->camera = cam; }
+    std::map<std::string, std::shared_ptr<Mesh>> GetMeshes() { return meshes; };
 
-    void AddMesh(std::shared_ptr<Mesh> mesh);
-    void RemoveMesh(std::shared_ptr<Mesh> mesh);
-    void AddMaterial(std::shared_ptr<Material> material);
-    void RemoveMaterial(std::shared_ptr<Material> material);
+    std::shared_ptr<BaseCamera> GetCamera() { return camera; }
+    void SetCamera(std::shared_ptr<BaseCamera> cam) { this->camera = cam; }
+
+    void AddMesh(Mesh* mesh, bool overrideExisting = false);
+    void RemoveMesh(std::string id);
 };
+

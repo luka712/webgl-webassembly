@@ -1,4 +1,10 @@
+
+#include "../../../../include/glm/mat4x4.hpp"
+#include "../../../../include/glm/matrix.hpp"
+#include "../../../../include/glm/ext.hpp"
+
 #include "../../headers/renderer/renderer.h"
+#include "../../headers/component/transformcomponent.h"
 
 Renderer::~Renderer()
 {
@@ -23,7 +29,6 @@ std::shared_ptr<Renderer>  Renderer::GetInstance()
 
 void Renderer::Initialize(int width, int height)
 {
-
     SDL_Init(SDL_INIT_VIDEO);
 
     // version needs to be setup before renderer creationg
@@ -57,25 +62,32 @@ void Renderer::Draw()
     // 3. set uniforms and bind texture units
     // 4. call draw
 
+
     auto meshes = SceneManager::GetInstance()->GetCurrentScene()->GetMeshes();
     auto camera = SceneManager::GetInstance()->GetCurrentScene()->GetCamera();
-    for (auto const &mesh : *meshes)
+    auto objects = SceneManager::GetInstance()->GetCurrentScene()->GetObjects();
+
+    for (auto object : objects)
     {
+        auto mesh = object->mesh;
+        auto transform = object->transform;
+
         //TODO: optimization flags
         // meshes will have shaders which should be bound accordingly, possibly sorted properly due to optimization reasons.
-        mesh->BindBuffers();
+        auto geometry = mesh->geometry;
+        geometry->BindBuffers();
+        mesh->material->GetShader()->UseProgram();
 
-        mesh->UseShader();
+        transform->Update();
+        glm::mat4 i = glm::mat4(1.0f);
+        mesh->material->GetShader()->SetMatrix4("u_transform", transform->transform);
+        mesh->material->GetShader()->SetMatrix4("u_view", camera->GetViewMatrix());
+        mesh->material->GetShader()->SetMatrix4("u_projection", camera->GetProjectionMatrix());
 
-        auto transform = mesh->GetTransform();
-        transform->ApplyTransformations();
-        mesh->GetMaterial()->GetShader()->SetMatrix4("u_transform", transform->transform);
-        mesh->GetMaterial()->GetShader()->SetMatrix4("u_view", camera->getViewMatrix());
-        mesh->GetMaterial()->GetShader()->SetMatrix4("u_projection", camera->getProjectionMatrix());
+        glDrawElements(GL_TRIANGLES, mesh->geometry->GetIndexBuffer()->GetLength(), GL_UNSIGNED_INT, 0);
 
-        glDrawElements(GL_TRIANGLES, mesh->GetIndexBuffer()->GetLength(), GL_UNSIGNED_INT, 0);
-
-        mesh->StopShader();
+        // mesh->geometry->UnbindBuffers();
+        // mesh->material->GetShader()->StopProgram();
     }
 }
 

@@ -27,7 +27,29 @@ interface WasmExporetedSceneManager
     GetCurrent(): WasmExportedScene;
 }
 
+enum CameraType 
+{
+    BaseCamera = 0,
+    PerspectiveCamera,
+    FreeCamera
+}
+
+interface WasmExportedCamera
+{
+    readonly type: CameraType;
+}
+
+interface WasmExportedPerspectiveCamera extends WasmExportedCamera
+{
+    
+}
+
+interface WasmExportedFreeCamera extends WasmExportedPerspectiveCamera
+{
+    Playback(): void;
+}
+
 interface WasmExportedScene
 {
-
+    GetCamera<T extends WasmExportedCamera>(): T;
 }

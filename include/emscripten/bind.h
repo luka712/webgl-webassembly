@@ -1385,7 +1385,7 @@ namespace emscripten {
     };
 
     template<typename ClassType, typename BaseSpecifier = internal::NoBaseClass>
-    class class_ {
+    class httclass_ {
     public:
         typedef ClassType class_type;
         typedef BaseSpecifier base_specifier;

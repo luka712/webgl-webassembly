@@ -14,7 +14,9 @@
 #include <stdio.h>
 
 #include "./headers/io/filemanger.h"
+#include "./headers/event/event.h"
 #include "./headers/renderer/renderer.h"
+#include "./headers/component/transformcomponent.h"
 
 using namespace emscripten;
 
@@ -31,14 +33,18 @@ struct vec2
 
 void Initialize();
 void Load();
-void draw();
+void Update();
+void Draw();
 
 int main()
 {
     Initialize();
 
     // request animation draw from javascript
-    emscripten_set_main_loop(draw, 0, 0);
+    emscripten_set_main_loop([]() -> void {
+        Update();
+        Draw();
+    }, 0, 0);
 }
 
 void Initialize()
@@ -49,10 +55,27 @@ void Initialize()
     // 2. After renderer scene manager is to be initialized.
     SceneManager::GetInstance()->Initialize();
 
-    auto cb = [](std::shared_ptr<Scene> scene) -> void {
-        printf("Scene created callback\n");
+    auto cb = [](Scene *scene) -> void {
+        
+        auto camera = std::make_shared<FreeCamera>();
+        scene->SetCamera(camera);
+
+        // auto mesh = new CubeMesh("default_cube_mesh");
+        // mesh->Initialize();
+        // scene->AddMesh(mesh);
+
+        LOG("CREATING SCENE OBJECT");
+        auto sceneObj = new SceneObject(scene);
+        LOG("CREATING TRANSFORM OBJECT");
+        sceneObj->AddComponent(new TransformComponent());
+        LOG("CREATING MESH OBJECT");
+        sceneObj->AddComponent(new CubeMesh());
+        LOG("CREATED MESH OBJECT");
+
+        // auto mesh = std::make_shared<CubeMesh>();
+        // this->current->AddMesh(mesh);
     };
-    SceneManager::GetInstance()->GetEventDispatcher()->registerEvent(new Event<std::shared_ptr<Scene>>(EventType::SceneManagerInitialized, cb));
+    SceneManager::GetInstance()->GetEventDispatcher()->registerEvent(new Event<Scene*>(EventType::SceneManagerInitialized, cb));
     SceneManager::GetInstance()->GetEventDispatcher()->dispatchEvent(EventType::SceneManagerInitialized, SceneManager::GetInstance()->GetCurrentScene());
 }
 
@@ -61,7 +84,13 @@ void Load()
 
 }
 
-void draw()
+void Update()
+{
+    auto camera = SceneManager::GetInstance()->GetCurrentScene()->GetCamera();
+    camera->Update();
+}
+
+void Draw()
 {
     Renderer::GetInstance()->Draw();
 }
@@ -206,16 +235,16 @@ EMSCRIPTEN_BINDINGS(shader)
              allow_raw_pointers());
 }
 
-// Export File Manager
-EMSCRIPTEN_BINDINGS(export_file_manager)
-{
-    auto overrideReadFile = optional_override([](FileManager &self, const std::string &s) {
-        return self.ReadFile(s.c_str());
-    });
+// // Export File Manager
+// EMSCRIPTEN_BINDINGS(export_file_manager)
+// {
+//     auto overrideReadFile = optional_override([](FileManager &self, const std::string &s) {
+//         return self.ReadFile(s.c_str());
+//     });
 
-    class_<FileManager>("FileManager")
-        .constructor()
-        // for raw pointers do an override
-        .function("readFile", overrideReadFile, allow_raw_pointers());
-}
+//     class_<FileManager>("FileManager")
+//         .constructor()
+//         // for raw pointers do an override
+//         .function("readFile", overrideReadFile, allow_raw_pointers());
+// }
 #pragma endregion

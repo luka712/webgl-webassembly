@@ -1,10 +1,9 @@
-#include "../../headers/buffers/buffers.h"
+#include "../../../../headers/mesh/geometry/buffers/buffers.h"
 
-IndexBuffer::IndexBuffer(const GLuint *data, const int length)
+IndexBuffer::IndexBuffer(std::string id, const GLuint *data, const int length) : data(data), length(length)
 {
+    this->id = id;
     LOG_CONSTRUCTOR();
-    this->data = data;
-    this->length = length;
 }
 
 IndexBuffer::~IndexBuffer()
